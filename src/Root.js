@@ -1,15 +1,15 @@
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import App from "./App";
+// import React from "react";
+// import { BrowserRouter, Route, Routes } from "react-router-dom";
+// import App from "./App";
 
-const Root = ({ store }) => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
+// const Root = ({ store }) => {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         <Route path="/" element={<App />} />
+//       </Routes>
+//     </BrowserRouter>
+//   );
+// };
 
-export default Root;
+// export default Root;

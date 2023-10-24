@@ -6,13 +6,13 @@ import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Login from "../pages/Login";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  NavLink,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 function OffcanvasExample() {
+  const navigate = useNavigate();
+  const goLogin = (e) => {
+    e.preventDefault();
+    navigate("/login");
+  };
   return (
     <>
       {["sm"].map((expand) => (
@@ -32,7 +32,7 @@ function OffcanvasExample() {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-end flex-grow-1 pe-3">
-                  <Nav.Link href="/login">Login</Nav.Link>
+                  <Nav.Link onClick={goLogin}>Login</Nav.Link>
                   <Nav.Link href="/manage">Manage</Nav.Link>
                   <NavDropdown
                     title="기타"
@@ -62,10 +62,6 @@ function OffcanvasExample() {
           </Container>
         </Navbar>
       ))}
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        {/* <Route path="/manage" element={<Manage />} /> */}
-      </Routes>
     </>
   );
 }

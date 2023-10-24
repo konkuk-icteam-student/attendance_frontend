@@ -18,10 +18,7 @@ function Home() {
           <div className="col-lg-6">{commuteInfo}</div>
           <div className="col-lg-5">
             <h1 className="font-weight-light">2023-2&nbsp;정보운영팀 출근부</h1>
-            <p>
-              출퇴근 시 하단 버튼을 누르고 지문을 인식해주세요. 퇴근은 30분 미만
-              근무 시, 퇴근처리는 할 수 없습니다.
-            </p>
+            <p>관리용 홈페이지..</p>
             <a className="btn btn-primary" onClick={handleCommuteBtn} href="#!">
               출/퇴근하기
             </a>
