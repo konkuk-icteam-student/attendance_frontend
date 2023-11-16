@@ -12,36 +12,19 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/styles.css";
 import Nav from "./component/Nav";
 import Home from "./Home";
-import Login from "./pages/Login";
-import Manage from "./pages/Manage";
+import Login from "./pages/common/LoginPage";
+import Manage from "./pages/admin/ManagementListPage";
+import Signup from "./pages/common/SignupPage";
+import EditWorkRecords from "./pages/admin/EditWorkRecords";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route
-        path="/"
-        element={
-          <Nav>
-            <Home />
-          </Nav>
-        }
-      />
-      <Route
-        path="/login"
-        element={
-          <Nav>
-            <Login />
-          </Nav>
-        }
-      />
-      <Route
-        path="/manage"
-        element={
-          <Nav>
-            <Manage />
-          </Nav>
-        }
-      />
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/manage" element={<Manage />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/workinginfo" element={<EditWorkRecords />} />
     </Routes>
   </BrowserRouter>
 );

@@ -5,9 +5,9 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Offcanvas from "react-bootstrap/Offcanvas";
-import Login from "../pages/Login";
+import Login from "../pages/common/LoginPage";
 import { useNavigate } from "react-router-dom";
-function OffcanvasExample() {
+function MyNav() {
   const navigate = useNavigate();
   const goLogin = (e) => {
     e.preventDefault();
@@ -18,7 +18,7 @@ function OffcanvasExample() {
       {["sm"].map((expand) => (
         <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3">
           <Container fluid>
-            <Navbar.Brand href="#">건국대 정보운영팀</Navbar.Brand>
+            <Navbar.Brand href="/">건국대 정보운영팀</Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
               id={`offcanvasNavbar-expand-${expand}`}
@@ -66,4 +66,4 @@ function OffcanvasExample() {
   );
 }
 
-export default OffcanvasExample;
+export default MyNav;
