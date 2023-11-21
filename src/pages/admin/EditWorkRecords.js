@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import Modal from "react-Modal";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Nav from "../../component/Nav";
@@ -7,13 +6,15 @@ import { useTable, usePagination } from "react-table";
 import { useNavigate } from "react-router-dom";
 import PageIndex from "../../component/PageIndex";
 import CustomModal from "../../component/TimePickerModal"; // 모달 컴포넌트 임포트
-
+import styles from "../../css/Modal.module.css";
+import TimePickerModal from "../../component/TimePickerModal";
 function EditWorkRecords() {
   //   const secondcolumns = useMemo(() => TableColumns, []);
-  const [pageSize, setPageSize] = useState(12);
+  //const [pageSize, setPageSize] = useState(12);
   // const [tableData, setTableData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showModal, setShowModal] = useState(false);
+  //const [currentPage, setCurrentPage] = useState(1);
+  const [modalOpen, setModalOpen] = useState(false);
+  const modalBackground = useRef();
 
   const TableColumns = [
     {
@@ -47,65 +48,80 @@ function EditWorkRecords() {
     { date: "11.15", working_time: "10:00~12:00", sum: 2.0 },
   ];
 
-  const handleRowClick = (rowIdx) => {
-    // const editedRowData = [...editData];
+  // const handleRowClick = (rowIdx) => {
+  //   // const editedRowData = [...editData];
 
-    console.log(rowIdx);
-    if (!showModal) {
-      setShowModal(true);
-    }
-  };
+  //   console.log(rowIdx);
+  //   if (!showModal) {
+  //     setShowModal(true);
+  //   }
+  // };
 
-  const gotoPage = (page) => {
-    if (currentPage !== page) {
-      setCurrentPage(page);
-    }
-  };
+  // const gotoPage = (page) => {
+  //   if (currentPage !== page) {
+  //     setCurrentPage(page);
+  //   }
+  // };
 
-  const getCurrentPageData = () => {
-    if (dummyData) {
-      const startIndex = (currentPage - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      return dummyData.slice(startIndex, endIndex);
-    }
-    return [];
-  };
+  // const getCurrentPageData = () => {
+  //   if (dummyData) {
+  //     const startIndex = (currentPage - 1) * pageSize;
+  //     const endIndex = startIndex + pageSize;
+  //     return dummyData.slice(startIndex, endIndex);
+  //   }
+  //   return [];
+  // };
 
-  // 현재 페이지에 해당하는 데이터를 가져옵니다.
-  const currentPageData = useMemo(
-    () => getCurrentPageData(),
-    [dummyData, currentPage]
-  );
-  const {
-    getTableProps: getTableProps,
-    getTableBodyProps: getTableBodyProps,
-    headerGroups: tableHeaderGroups,
-    rows: tableRows,
-    prepareRow: prepareTableRow,
-  } = useTable(
-    {
-      columns: TableColumns,
-      data: currentPageData, // 두 번째 테이블의 데이터
-      initialState: { pageIndex: 0, pageSize },
-    },
-    usePagination // 페이지네이션 사용
-  );
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-
-  // 모달을 닫기 위한 핸들러
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
-
+  // // 현재 페이지에 해당하는 데이터를 가져옵니다.
+  // const currentPageData = useMemo(
+  //   () => getCurrentPageData(),
+  //   [dummyData, currentPage]
+  // );
+  // const {
+  //   getTableProps: getTableProps,
+  //   getTableBodyProps: getTableBodyProps,
+  //   headerGroups: tableHeaderGroups,
+  //   rows: tableRows,
+  //   prepareRow: prepareTableRow,
+  // } = useTable(
+  //   {
+  //     columns: TableColumns,
+  //     data: currentPageData,
+  //     initialState: { pageIndex: 0, pageSize },
+  //   },
+  //   usePagination // 페이지네이션 사용
+  // );
+  const ModalComponent = React.memo(() => {
+    return (
+      <div className={styles.modal_container}>
+        <div
+          className={styles.modal_content}
+          ref={modalBackground}
+          onClick={(e) => {
+            if (e.target === modalBackground.current) {
+              setModalOpen(false);
+            }
+          }}
+        >
+          <h2>근로 시간 수정</h2>
+          <TimePickerModal />
+          <div className={styles.btn_wrapper}>
+            <button
+              className={styles.modal_close_btn}
+              onClick={() => setModalOpen(false)}
+            >
+              모달 닫기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  });
   return (
     <>
       <Nav />
-      <Modal isOpen={true}>This is Modal content</Modal>
-
-      <div class="container text-center">
+      <div>{modalOpen && <ModalComponent />}</div>
+      {/* <div class="container text-center">
         <div class="row">
           <div class="col">
             {" "}
@@ -140,11 +156,7 @@ function EditWorkRecords() {
               {tableRows.map((row, rowIdx) => {
                 prepareTableRow(row);
                 return (
-                  <tr
-                    key={rowIdx}
-                    {...row.getRowProps()}
-                    onClick={() => handleRowClick(rowIdx)}
-                  >
+                  <tr key={rowIdx} {...row.getRowProps()}>
                     {row.cells.map((cell, colIdx) => (
                       <td {...cell.getCellProps()}>
                         {
@@ -163,14 +175,22 @@ function EditWorkRecords() {
               type="button"
               style={{ width: "25%" }} // 버튼의 너비를 25%로 지정
               onClick={() => {
-                /* Edit 버튼 클릭 핸들러 추가 */
+                setModalOpen(true);
               }}
             >
               Edit
             </button>
           </div>
         </div>
-      </div>
+      </div> */}
+      <button
+        className="btn btn-outline-secondary"
+        type="button"
+        style={{ width: "25%" }} // 버튼의 너비를 25%로 지정
+        onClick={() => setModalOpen(true)}
+      >
+        Edit
+      </button>
     </>
   );
 }
