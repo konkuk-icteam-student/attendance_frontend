@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -11,12 +11,8 @@ import { styled } from "@mui/material/styles";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-// import { DateField } from "@mui/x-date-pickers/DateField";
-// import { TimeField } from "@mui/x-date-pickers/TimeField";
-// import { DateTimeField } from "@mui/x-date-pickers/DateTimeField";
-import { MultiInputDateRangeField } from "@mui/x-date-pickers-pro/MultiInputDateRangeField";
-import { MultiInputDateTimeRangeField } from "@mui/x-date-pickers-pro/MultiInputDateTimeRangeField";
-function CustomModal({ message }) {
+
+function CustomModal({ defaultdata, dateChange, timeChange }) {
   const customModalStyles = {
     overlay: {
       backgroundColor: " rgba(0, 0, 0, 0.4)",
@@ -42,10 +38,23 @@ function CustomModal({ message }) {
       overflow: "auto",
     },
   };
-
+  const handleEditTime = (data) => {
+    timeChange(data);
+  };
+  const handleEditDate = (data) => {
+    dateChange(data);
+  };
+  useEffect(() => {
+    console.log("data", defaultdata);
+    // timeChange(defaultdata.start_time);
+  });
+  // console.log("timepicker", defaultdata);
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DatePicker defaultValue={dayjs("2022-04-17")} />
+      <DatePicker
+        defaultValue={dayjs(defaultdata.date)}
+        onChange={(data) => handleEditDate(data)}
+      />
       <DemoContainer
         components={[
           "DateField",
@@ -57,7 +66,15 @@ function CustomModal({ message }) {
         ]}
       >
         <MultiInputTimeRangeField
-          defaultValue={[dayjs("2022-04-17T15:30"), dayjs("2022-04-17T18:30")]}
+          defaultValue={[
+            dayjs(`${defaultdata.date}T${defaultdata.start_time}`),
+            dayjs(`${defaultdata.date}T${defaultdata.end_time}`),
+          ]}
+          onChange={(data) => {
+            // dateChange(data);
+            console.log("timedata", data);
+            handleEditTime(data);
+          }}
         />
       </DemoContainer>
     </LocalizationProvider>

@@ -16,6 +16,7 @@ import Login from "./pages/common/LoginPage";
 import Manage from "./pages/admin/ManagementListPage";
 import Signup from "./pages/common/SignupPage";
 import EditWorkRecords from "./pages/admin/EditWorkRecords";
+import DepartmentManagementPage from "./pages/admin/DepartmentManagementPage";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
@@ -25,6 +26,7 @@ root.render(
       <Route path="/manage" element={<Manage />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/workinginfo" element={<EditWorkRecords />} />
+      <Route path="/department-manage" element={<DepartmentManagementPage />} />
     </Routes>
   </BrowserRouter>
 );
