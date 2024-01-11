@@ -1,29 +1,37 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
 import Nav from "../../component/Nav";
-import { useTable, usePagination } from "react-table";
-import { useNavigate } from "react-router-dom";
-import PageIndex from "../../component/PageIndex";
-import CustomModal from "../../component/TimePickerModal"; // 모달 컴포넌트 임포트
-import styles from "../../css/Modal.module.css";
-import TimePickerModal from "../../component/TimePickerModal";
-function EditWorkRecords() {
-  //   const secondcolumns = useMemo(() => TableColumns, []);
-  //const [pageSize, setPageSize] = useState(12);
-  // const [tableData, setTableData] = useState([]);
-  //const [currentPage, setCurrentPage] = useState(1);
-  const [modalOpen, setModalOpen] = useState(false);
-  const modalBackground = useRef();
+import Table from "../../component/Table";
+import ModalComponent from "../../component/Modal";
+import dayjs from "dayjs";
+import client from "../../util/clients";
 
+// 학생 근로시간을 수정할 수 있는 페이지
+function EditWorkRecords() {
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  //선택된 학생 이름
+  const [selectedStudentValue, setSelectedStudentValue] = useState(null);
+  //선택된 학생 아이디(학번)
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
+
+  //선택된 row
+  const [selectedRowData, setSelectedRowData] = useState(null);
+  //근로 학생 리스트
+  const [studentList, setStudentList] = useState([]);
+  //근로 시간 데이터 세팅
+  const [workTimeData, setWorkTimeData] = useState([]);
   const TableColumns = [
     {
       accessor: "date",
       Header: "날짜",
     },
     {
-      accessor: "working_time",
-      Header: "근로 시간",
+      accessor: "start_time",
+      Header: "출근",
+    },
+    {
+      accessor: "end_time",
+      Header: "퇴근",
     },
     {
       accessor: "sum",
@@ -31,166 +39,149 @@ function EditWorkRecords() {
     },
   ];
   const dummyData = [
-    { date: "11.01", working_time: "09:00~11:00", sum: 2.0 },
-    { date: "11.02", working_time: "08:30~11:00", sum: 2.5 },
-    { date: "11.03", working_time: "10:00~12:00", sum: 2.0 },
-    { date: "11.04", working_time: "09:30~11:30", sum: 2.0 },
-    { date: "11.05", working_time: "08:00~10:30", sum: 2.5 },
-    { date: "11.06", working_time: "09:00~11:30", sum: 2.5 },
-    { date: "11.07", working_time: "08:30~11:30", sum: 3.0 },
-    { date: "11.08", working_time: "10:00~12:00", sum: 2.0 },
-    { date: "11.09", working_time: "09:30~11:30", sum: 2.0 },
-    { date: "11.10", working_time: "08:00~10:00", sum: 2.0 },
-    { date: "11.11", working_time: "09:00~11:00", sum: 2.0 },
-    { date: "11.12", working_time: "08:30~10:30", sum: 2.0 },
-    { date: "11.13", working_time: "09:30~11:30", sum: 2.0 },
-    { date: "11.14", working_time: "08:00~10:00", sum: 2.0 },
-    { date: "11.15", working_time: "10:00~12:00", sum: 2.0 },
+    { date: "2023-11-01", start_time: "09:00", end_time: "11:00", sum: 2.0 },
+    { date: "2023-11-02", start_time: "09:00", end_time: "11:00", sum: 2.5 },
+    { date: "2023-11-03", start_time: "13:00", end_time: "16:00", sum: 3.0 },
+    { date: "2023-11-04", start_time: "15:30", end_time: "17:30", sum: 2.0 },
+    { date: "2023-11-05", start_time: "09:00", end_time: "11:30", sum: 2.5 },
+    { date: "2023-11-06", start_time: "09:00", end_time: "11:00", sum: 2.0 },
+    { date: "2023-11-07", start_time: "09:00", end_time: "11:30", sum: 2.5 },
+    { date: "2023-11-08", start_time: "13:00", end_time: "16:00", sum: 3.0 },
+    { date: "2023-11-09", start_time: "15:30", end_time: "17:30", sum: 2.0 },
+    { date: "2023-11-10", start_time: "09:00", end_time: "11:00", sum: 2.0 },
+    { date: "2023-11-11", start_time: "15:30", end_time: "17:30", sum: 2.0 },
+    { date: "2023-11-12", start_time: "15:30", end_time: "17:30", sum: 2.0 },
+    { date: "2023-11-13", start_time: "15:30", end_time: "17:30", sum: 2.0 },
+    { date: "2023-11-14", start_time: "09:00", end_time: "11:00", sum: 2.0 },
+    { date: "2023-11-15", start_time: "13:00", end_time: "16:00", sum: 3.0 },
   ];
+  const total_work_hours = 32.5;
+  const handleEditClick = (rowData) => {
+    setSelectedRowData(rowData);
+    // setModalOpen(true);
+    console.log("editworkrecord:??", rowData);
+  };
 
-  // const handleRowClick = (rowIdx) => {
-  //   // const editedRowData = [...editData];
+  const modifyWorktime = (editDate, editStartTime, editEndTime) => {
+    // console.log("modifyWorktime");
+    // console.log("editDate", editDate.format("YYYY-MM-DD"));
+    // console.log("editStartTime", editStartTime);
+    // console.log("editEndTime", editEndTime);
+    setEditModalOpen(false);
+  };
+  const addWorktime = (editDate, editStartTime, editEndTime) => {
+    // console.log("addWorktime");
+    // console.log("editDate", editDate.format("YYYY-MM-DD"));
+    // console.log("editStartTime", editStartTime);
+    // console.log("editEndTime", editEndTime);
+    setAddModalOpen(false);
+  };
+  //부서에 속한 학생 목록 가져오기 (현재는 1번 부서)
+  const fetchStudentList = () => {
+    client.get("/dept/1").then((res) => {
+      setStudentList(res.data.users);
+    });
+    console.log("studentList", studentList);
+  };
+  //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
+  const handleSelectStudent = async (event) => {
+    setSelectedStudentId(event.target.value);
+    // await client.get(`/worktime/${event.target.value}`).then((res) => {
+    //   console.log("res.data", res.data);
+    //   setWorkTimeData(res.data);
+    // });
+  };
+  useEffect(() => {
+    console.log("?");
+    // client.get("/user/attendance-log").then((res) => {
+    //   console.log("server resonse?\n", res);
+    // });
+    fetchStudentList();
+  }, []);
 
-  //   console.log(rowIdx);
-  //   if (!showModal) {
-  //     setShowModal(true);
-  //   }
-  // };
-
-  // const gotoPage = (page) => {
-  //   if (currentPage !== page) {
-  //     setCurrentPage(page);
-  //   }
-  // };
-
-  // const getCurrentPageData = () => {
-  //   if (dummyData) {
-  //     const startIndex = (currentPage - 1) * pageSize;
-  //     const endIndex = startIndex + pageSize;
-  //     return dummyData.slice(startIndex, endIndex);
-  //   }
-  //   return [];
-  // };
-
-  // // 현재 페이지에 해당하는 데이터를 가져옵니다.
-  // const currentPageData = useMemo(
-  //   () => getCurrentPageData(),
-  //   [dummyData, currentPage]
-  // );
-  // const {
-  //   getTableProps: getTableProps,
-  //   getTableBodyProps: getTableBodyProps,
-  //   headerGroups: tableHeaderGroups,
-  //   rows: tableRows,
-  //   prepareRow: prepareTableRow,
-  // } = useTable(
-  //   {
-  //     columns: TableColumns,
-  //     data: currentPageData,
-  //     initialState: { pageIndex: 0, pageSize },
-  //   },
-  //   usePagination // 페이지네이션 사용
-  // );
-  const ModalComponent = React.memo(() => {
-    return (
-      <div className={styles.modal_container}>
-        <div
-          className={styles.modal_content}
-          ref={modalBackground}
-          onClick={(e) => {
-            if (e.target === modalBackground.current) {
-              setModalOpen(false);
-            }
-          }}
-        >
-          <h2>근로 시간 수정</h2>
-          <TimePickerModal />
-          <div className={styles.btn_wrapper}>
-            <button
-              className={styles.modal_close_btn}
-              onClick={() => setModalOpen(false)}
-            >
-              모달 닫기
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  });
   return (
     <>
       <Nav />
-      <div>{modalOpen && <ModalComponent />}</div>
-      {/* <div class="container text-center">
-        <div class="row">
-          <div class="col">
-            {" "}
-            <select class="form-select" aria-label="Default select example">
-              <option selected>부서</option>
-              <option value="1">정보운영팀</option>
-              <option value="2">입학처</option>
-              <option value="3">공과대학행정</option>
-            </select>
-          </div>
-          <div class="col">
-            <select class="form-select" aria-label="Default select example">
-              <option selected>학생</option>
-              <option value="1">김나경</option>
-              <option value="2">박준형</option>
+      <div>
+        {/* 학생 근로 시간 수정하는 모달 */}
+        {editModalOpen && (
+          <ModalComponent
+            title="근로 시간 수정"
+            rowData={selectedRowData}
+            onClose={() => setEditModalOpen(false)}
+            modifyWorktime={modifyWorktime}
+          />
+        )}
+        {/* 근로 시간 새로 추가하는 모달 */}
+        {addModalOpen && (
+          <ModalComponent
+            title="근로 시간 추가"
+            rowData={dayjs("2024-01-01T09:00")}
+            onClose={() => setAddModalOpen(false)}
+            modifyWorktime={addWorktime}
+          />
+        )}
+      </div>
+      <div className="container text-center">
+        <div className="row">
+          <div className="col">
+            <select
+              className="form-select"
+              aria-label="Default select example"
+              onChange={handleSelectStudent}
+            >
+              <option defaultValue="학생">학생</option>
+
+              {
+                //학생 목록 띄우기
+                studentList.map((student) => {
+                  return (
+                    <option key={student.userId} value={student.userId}>
+                      {student.userName}
+                    </option>
+                  );
+                })
+              }
             </select>
           </div>
         </div>
 
         <div className="row">
-          <table className="table" {...getTableProps()}>
-            <thead>
-              {tableHeaderGroups.map((header) => (
-                <tr {...header.getHeaderGroupProps()}>
-                  {header.headers.map((col) => (
-                    <th {...col.getHeaderProps()}>{col.render("Header")}</th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody {...getTableBodyProps()}>
-              {tableRows.map((row, rowIdx) => {
-                prepareTableRow(row);
-                return (
-                  <tr key={rowIdx} {...row.getRowProps()}>
-                    {row.cells.map((cell, colIdx) => (
-                      <td {...cell.getCellProps()}>
-                        {
-                          cell.render("Cell") // 편집 모드가 아닐 때
-                        }
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <Table
+            columns={TableColumns}
+            data={dummyData}
+            onEditClick={handleEditClick}
+          />
+          <div className="row justify-content-end mt-3">
+            총 근로: {total_work_hours}시간
+          </div>
           <div className="row justify-content-end mt-3">
             <button
               className="btn btn-outline-secondary"
               type="button"
-              style={{ width: "25%" }} // 버튼의 너비를 25%로 지정
+              style={{ width: "25%" }}
               onClick={() => {
-                setModalOpen(true);
+                setEditModalOpen(true);
               }}
+              disabled={!selectedRowData}
             >
               Edit
             </button>
           </div>
+          <div className="row justify-content-end mt-3">
+            <button
+              className="btn btn-outline-secondary"
+              type="button"
+              style={{ width: "25%" }}
+              onClick={() => {
+                setAddModalOpen(true);
+              }}
+            >
+              Add
+            </button>
+          </div>
         </div>
-      </div> */}
-      <button
-        className="btn btn-outline-secondary"
-        type="button"
-        style={{ width: "25%" }} // 버튼의 너비를 25%로 지정
-        onClick={() => setModalOpen(true)}
-      >
-        Edit
-      </button>
+      </div>
     </>
   );
 }

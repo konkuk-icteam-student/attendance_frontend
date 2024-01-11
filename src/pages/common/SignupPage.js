@@ -1,20 +1,64 @@
-import React, { useState } from "react";
-import Form from "react-bootstrap/Form";
+import React, { useEffect, useState } from "react";
 import InputGroup from "react-bootstrap/InputGroup";
 import Nav from "../../component/Nav";
 import { useNavigate } from "react-router-dom";
-import Dropdown from "react-bootstrap/Dropdown";
-import DropdownButton from "react-bootstrap/DropdownButton";
-
+import client from "../../util/clients";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 function Signup() {
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [inputDisabled, setInputDisabled] = useState(true);
+  const [departmentsList, setDepartmentsList] = useState([]);
+  const [studentId, setStudentId] = useState("");
+  const [studentPw, setStudentPw] = useState("");
+  const [studentName, setStudentName] = useState("");
+  const [studentPhoneNum, setStudentPhoneNum] = useState("");
+  const [studentDepartment, setStudentDepartment] = useState("");
 
   let navigate = useNavigate();
-  const handleDepartmentSelect = (selectedValue) => {
-    setSelectedDepartment(selectedValue);
-    setInputDisabled(true);
+  const handleStudentIdChange = (event) => {
+    setStudentId(event.target.value);
   };
+
+  const handleStudentPwChange = (event) => {
+    setStudentPw(event.target.value);
+  };
+
+  const handleStudentNameChange = (event) => {
+    setStudentName(event.target.value);
+  };
+
+  const handleStudentPhoneNumChange = (event) => {
+    setStudentPhoneNum(event.target.value);
+  };
+
+  const handleDepartmentSelect = (selectedValue) => {
+    setStudentDepartment(selectedValue);
+  };
+  const handleSignup = () => {
+    //회원가입 버튼 눌렀을 때
+    console.log(studentDepartment);
+    client
+      .post("/user/new-user", {
+        user_id: studentId,
+        user_pw: studentPw,
+        user_name: studentName,
+        userPhoneNum: studentPhoneNum,
+        dept: studentDepartment,
+      })
+      .then((response) => {
+        console.log(response);
+        alert("회원가입 성공");
+        navigate("/login");
+      });
+  };
+
+  useEffect(() => {
+    client.get("/dept/list").then((response) => {
+      console.log(response.data);
+      setDepartmentsList(response.data);
+    });
+  }, [studentDepartment]);
   return (
     <>
       <Nav />
@@ -28,6 +72,8 @@ function Signup() {
             type="text"
             placeholder="학번"
             aria-label=".form-control-sm example"
+            value={studentId}
+            onChange={handleStudentIdChange}
           />
         </InputGroup>
         <InputGroup className="mb-3 w-50 mx-auto">
@@ -37,6 +83,8 @@ function Signup() {
             type="password"
             placeholder="비밀번호"
             aria-label=".form-control-sm example"
+            value={studentPw}
+            onChange={handleStudentPwChange}
           />
         </InputGroup>
         <InputGroup className="mb-3 w-50 mx-auto">
@@ -55,6 +103,8 @@ function Signup() {
             type="text"
             placeholder="이름"
             aria-label=".form-control-sm example"
+            value={studentName}
+            onChange={handleStudentNameChange}
           />
         </InputGroup>
         <InputGroup className="mb-3 w-50 mx-auto">
@@ -64,74 +114,36 @@ function Signup() {
             type="text"
             placeholder="010xxxxxxxx"
             aria-label=".form-control-sm example"
+            value={studentPhoneNum}
+            onChange={handleStudentPhoneNumChange}
           />
         </InputGroup>
-        <InputGroup className="mb-3 w-50 mx-auto">
-          <DropdownButton
-            variant="outline-secondary"
-            title="부서"
-            id="input-group-dropdown-4"
-            align="end"
+        <FormControl className="mb-3 w-50 mx-auto">
+          <InputLabel id="demo-simple-select-label">부서</InputLabel>
+          <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            onChange={(e) => setStudentDepartment(e.target.value)}
+            label="부서"
+            value={studentDepartment}
           >
-            <Dropdown.Item onClick={() => handleDepartmentSelect("정보통신처")}>
-              정보통신처
-            </Dropdown.Item>
-            <Dropdown.Item onClick={() => handleDepartmentSelect("입학처")}>
-              입학처
-            </Dropdown.Item>
-            <Dropdown.Item
-              onClick={() => handleDepartmentSelect("공과대학 행정")}
-            >
-              공과대학 행정
-            </Dropdown.Item>
-          </DropdownButton>
-          <Form.Control
-            value={selectedDepartment}
-            onChange={(e) => setSelectedDepartment(e.target.value)}
-            disabled={inputDisabled}
-            aria-label="Text input with 2 dropdown buttons"
-          />
-        </InputGroup>
-        {/* <InputGroup className="mb-3">
-        <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
-        <Form.Control
-          placeholder="Username"
-          aria-label="Username"
-          aria-describedby="basic-addon1"
-        />
-      </InputGroup>
-
-      <InputGroup className="mb-3">
-        <Form.Control
-          placeholder="Recipient's username"
-          aria-label="Recipient's username"
-          aria-describedby="basic-addon2"
-        />
-        <InputGroup.Text id="basic-addon2">@example.com</InputGroup.Text>
-      </InputGroup>
-
-      <Form.Label htmlFor="basic-url">Your vanity URL</Form.Label>
-      <InputGroup className="mb-3">
-        <InputGroup.Text id="basic-addon3">
-          https://example.com/users/
-        </InputGroup.Text>
-        <Form.Control id="basic-url" aria-describedby="basic-addon3" />
-      </InputGroup>
-
-      <InputGroup className="mb-3">
-        <InputGroup.Text>$</InputGroup.Text>
-        <Form.Control aria-label="Amount (to the nearest dollar)" />
-        <InputGroup.Text>.00</InputGroup.Text>
-      </InputGroup>
-
-      <InputGroup>
-        <InputGroup.Text>With textarea</InputGroup.Text>
-        <Form.Control as="textarea" aria-label="With textarea" />
-      </InputGroup> */}
+            {departmentsList.map((dept) => {
+              return (
+                <MenuItem
+                  value={dept.deptName}
+                  onClick={() => handleDepartmentSelect(dept.deptName)}
+                >
+                  {dept.deptName}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+        <br />
         <button
           className="ms-3 mb-3 btn btn-outline-secondary"
           type="button"
-          onClick={() => navigate("/")}
+          onClick={handleSignup}
         >
           Sign up
         </button>
