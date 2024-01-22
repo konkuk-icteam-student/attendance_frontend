@@ -1,18 +1,33 @@
-import React, { useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/styles.css";
 import Nav from "../src/component/Nav";
 import Board from "../src/component/Board";
+import client from "./util/clients";
+
 function Home() {
   const [commuteInfo, setCommuteInfo] = useState("출퇴근 버튼을 눌러주세요");
   const handleCommuteBtn = () => {
     setCommuteInfo("지문을 인식해주세요");
   };
-  const workingMembers = ["김호준", "김나경", "박준형", "지민영"];
+  const [workingMembers, setWorkingMembers] = useState([]);
+  const [deptList, setDeptList] = useState([]);
+  // const workingMembers = ["김호준", "김나경", "박준형", "지민영"];
   const [dept, setDept] = useState("정보운영팀");
   const handleDeptChange = (event) => {
     setDept(event.target.value);
+    client.get(`/user/attendance/current/${event.target.value}`).then((res) => {
+      setWorkingMembers(res.data);
+      console.log("??", res.data, event.target.value);
+    });
   };
+
+  useEffect(() => {
+    client.get("/dept/list").then((res) => {
+      setDeptList(res.data);
+      console.log(res.data);
+    });
+  }, [dept]);
   return (
     <div>
       <Nav />
@@ -25,9 +40,18 @@ function Home() {
             className="form-select"
             aria-label="Default select example"
           >
-            <option defaultValue="정보운영팀">정보운영팀</option>
+            <option defaultValue="none">부서선택</option>
+            {deptList.map((dept) => {
+              console.log("qntj?", dept.deptName);
+              return (
+                <option key={dept.id} value={dept.id}>
+                  {dept.deptName}
+                </option>
+              );
+            })}
+            {/* <option defaultValue="정보운영팀">정보운영팀</option>
             <option value="2">입학처</option>
-            <option value="3">공과대학행정</option>
+            <option value="3">공과대학행정</option> */}
           </select>
         </div>
         <div className="row gx-4 gx-lg-5 align-items-center my-5">
@@ -47,7 +71,7 @@ function Home() {
             <br />
             <div className="row justify-content-center">
               {workingMembers.map((member) => {
-                return <h5 className="m-0">{member}</h5>;
+                return <h5 className="m-0">{member.userName}</h5>;
               })}
             </div>
           </div>

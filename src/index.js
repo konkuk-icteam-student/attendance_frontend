@@ -15,7 +15,7 @@ import Home from "./Home";
 import Login from "./pages/common/LoginPage";
 import Manage from "./pages/admin/ManagementListPage";
 import Signup from "./pages/common/SignupPage";
-import EditWorkRecords from "./pages/admin/EditWorkRecords";
+import EditWorkRecords from "./pages/admin/EditWorkRecordsPage";
 import DepartmentManagementPage from "./pages/admin/DepartmentManagementPage";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
