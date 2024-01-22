@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import styles from "../css/Modal.module.css";
 import TimePickerModal from "../component/TimePickerModal";
+import MultiTimePickerModal from "../component/MultiTimePickerModal";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 const ModalComponent = React.memo(
@@ -60,7 +61,7 @@ const ModalComponent = React.memo(
         >
           <h2>{title}</h2>
           <br />
-          <TimePickerModal
+          <MultiTimePickerModal
             defaultdata={rowData}
             dateChange={handleEditDate}
             timeChange={handleEditTime}
