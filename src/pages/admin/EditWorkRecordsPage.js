@@ -78,22 +78,17 @@ function EditWorkRecords() {
     // setModalOpen(true);
     console.log("editworkrecord:??", rowData);
   };
-  const modifyWorktime = async (
-    editDate,
-    editAttendanceTime,
-    id,
-    attendanceStatus
-  ) => {
-    const body = {
-      attendanceDate: editDate.format("YYYY-MM-DD"),
+  const modifyWorktime = async (data) => {
+    // const body = {
+    //   attendanceDate: editDate.format("YYYY-MM-DD"),
 
-      attendanceTime:
-        editDate.format("YYYY-MM-DD") + " " + editAttendanceTime + ":00.000",
-      userId: selectedStudentId,
-      status: attendanceStatus,
-    };
-    console.log("body", body);
-    await client.put(`/user/attendance/${id}`, body).then((res) => {
+    //   attendanceTime:
+    //     editDate.format("YYYY-MM-DD") + " " + editAttendanceTime + ":00.000",
+    //   userId: selectedStudentId,
+    //   status: attendanceStatus,
+    // };
+    console.log("body", data);
+    await client.put(`/user/attendance`, data).then((res) => {
       console.log("res", res);
     });
 
@@ -138,50 +133,47 @@ function EditWorkRecords() {
   const handleSelectStudent = async (event) => {
     setSelectedStudentId(event.target.value);
 
-    console.log("event.target.value", event.target.value);
-    setWorkTimeData(dummydata);
+    // console.log("event.target.value", event.target.value);
+    // setWorkTimeData(dummydata);
 
     //추후 개발 건의: default year, month는 2024년 1월(Dayjs써서 현시점으로 세팅하고, 사용자가 조작할 수 있는 UI추가하면 좋을듯)
-    // await client
-    //   .get(`/user/attendance/monthly/${event.target.value}?year=2024&month=1`)
-    //   .then((res) => {
-    //     console.log("res.data", res.data);
-    //     res.data.sort((a, b) => {
-    //       return new Date(a.attendanceTime) - new Date(b.attendanceTime);
-    //     });
+    await client
+      .get(`/user/attendance/monthly/${event.target.value}?year=2024&month=1`)
+      .then((res) => {
+        console.log("res.data", res.data);
 
-    //     // const groupedData = [];
-    //     // var groupedItem = {};
-    //     // res.data.forEach((item, index) => {
-    //     //   if (item.status == "출근") {
-    //     //     groupedItem = {
-    //     //       ...item,
-    //     //       startTime: item.attendanceTime,
-    //     //       endTime: undefined,
-    //     //       formatStartTime: dayjs(item.attendanceTime).format("HH:mm"),
-    //     //       formatEndTime: undefined,
-    //     //     };
-    //     //   } else if (item.status == "퇴근") {
-    //     //     groupedItem = {
-    //     //       ...item,
-    //     //       startTime: undefined,
-    //     //       endTime: item.attendanceTime,
-    //     //       formatStartTime: undefined,
-    //     //       formatEndTime: dayjs(item.attendanceTime).format("HH:mm"),
-    //     //     };
-    //     //   } else {
-    //     //     groupedItem = {
-    //     //       ...item,
-    //     //       startTime: undefined,
-    //     //       endTime: undefined,
-    //     //       formatStartTime: undefined,
-    //     //       formatEndTime: undefined,
-    //     //     };
-    //     //   }
-    //     //   groupedData.push(groupedItem);
-    //     // });
-    //     // setWorkTimeData(groupedData);
-    //   });
+        // const groupedData = [];
+        // var groupedItem = {};
+        // res.data.forEach((item, index) => {
+        //   if (item.status == "출근") {
+        //     groupedItem = {
+        //       ...item,
+        //       startTime: item.attendanceTime,
+        //       endTime: undefined,
+        //       formatStartTime: dayjs(item.attendanceTime).format("HH:mm"),
+        //       formatEndTime: undefined,
+        //     };
+        //   } else if (item.status == "퇴근") {
+        //     groupedItem = {
+        //       ...item,
+        //       startTime: undefined,
+        //       endTime: item.attendanceTime,
+        //       formatStartTime: undefined,
+        //       formatEndTime: dayjs(item.attendanceTime).format("HH:mm"),
+        //     };
+        //   } else {
+        //     groupedItem = {
+        //       ...item,
+        //       startTime: undefined,
+        //       endTime: undefined,
+        //       formatStartTime: undefined,
+        //       formatEndTime: undefined,
+        //     };
+        //   }
+        //   groupedData.push(groupedItem);
+        // });
+        setWorkTimeData(res.data);
+      });
   };
   useEffect(() => {
     console.log("?");

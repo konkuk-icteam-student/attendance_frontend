@@ -14,9 +14,7 @@ const ModalComponent = React.memo(
     //   dayjs(rowData.startTime)
     // );
     // const [editEndTime, setEditEndTime] = useState(dayjs(rowData.endTime));
-    const [editAttendanceTime, setEditAttendanceTime] = useState(
-      dayjs(rowData.attendanceTime)
-    );
+    const [editAttendanceTime, setEditAttendanceTime] = useState(rowData);
     const style = {
       position: "absolute",
       top: "50%",
@@ -31,13 +29,16 @@ const ModalComponent = React.memo(
       pb: 3,
       borderRadius: "15px",
     };
-
+    const handleNewAttendanceData = (data) => {
+      setEditAttendanceTime(data);
+      console.log("dnewnewneata", data);
+    };
     const handleEditDate = (data) => {
       setEditDate(data);
     };
     const handleEditTime = (data) => {
       console.log("etstdata", data);
-      setEditAttendanceTime(dayjs(data).format("HH:MM"));
+      setEditAttendanceTime(dayjs(data).format("HH:mm"));
     };
     const handleAttendanceStatus = (attendanceStatus) => {
       console.log("attendanceStatus", attendanceStatus);
@@ -61,24 +62,26 @@ const ModalComponent = React.memo(
         >
           <h2>{title}</h2>
           <br />
-          <MultiTimePickerModal
-            defaultdata={rowData}
-            dateChange={handleEditDate}
-            timeChange={handleEditTime}
-            attendanceStatus={handleAttendanceStatus}
-          />
+          {title == "근로 시간 수정" ? (
+            <MultiTimePickerModal
+              defaultdata={rowData}
+              updatedTimeData={handleNewAttendanceData}
+            />
+          ) : (
+            <TimePickerModal
+              defaultdata={rowData}
+              dateChange={handleEditDate}
+              timeChange={handleEditTime}
+              attendanceStatus={handleAttendanceStatus}
+            />
+          )}
 
           <div className={styles.btn_wrapper}>
             <button
               className={styles.modal_close_btn}
               onClick={() => {
                 rowData.id
-                  ? modifyWorktime(
-                      editDate,
-                      editAttendanceTime,
-                      rowData.id,
-                      attendanceStatus
-                    )
+                  ? modifyWorktime(editAttendanceTime)
                   : modifyWorktime(
                       editDate,
                       editAttendanceTime,
