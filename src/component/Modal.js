@@ -8,8 +8,14 @@ const ModalComponent = React.memo(
     const modalBackground = useRef();
     const [modalOpen, setModalOpen] = useState(false);
     const [editDate, setEditDate] = useState(dayjs(rowData.date));
-    const [editStartTime, setEditStartTime] = useState(rowData.start_time);
-    const [editEndTime, setEditEndTime] = useState(rowData.end_time);
+    const [attendanceStatus, setAttendanceStatus] = useState();
+    // const [editStartTime, setEditStartTime] = useState(
+    //   dayjs(rowData.startTime)
+    // );
+    // const [editEndTime, setEditEndTime] = useState(dayjs(rowData.endTime));
+    const [editAttendanceTime, setEditAttendanceTime] = useState(
+      dayjs(rowData.attendanceTime)
+    );
     const style = {
       position: "absolute",
       top: "50%",
@@ -29,10 +35,12 @@ const ModalComponent = React.memo(
       setEditDate(data);
     };
     const handleEditTime = (data) => {
-      setEditStartTime(dayjs(data[0].$d).format("HH:mm"));
-      setEditEndTime(dayjs(data[1].$d).format("HH:mm"));
-      console.log("editStartTime", editStartTime);
-      console.log("editEndTime", editEndTime);
+      console.log("etstdata", data);
+      setEditAttendanceTime(dayjs(data).format("HH:MM"));
+    };
+    const handleAttendanceStatus = (attendanceStatus) => {
+      console.log("attendanceStatus", attendanceStatus);
+      setAttendanceStatus(attendanceStatus);
     };
     useEffect(() => {
       console.log("data", rowData);
@@ -56,16 +64,28 @@ const ModalComponent = React.memo(
             defaultdata={rowData}
             dateChange={handleEditDate}
             timeChange={handleEditTime}
+            attendanceStatus={handleAttendanceStatus}
           />
 
           <div className={styles.btn_wrapper}>
             <button
               className={styles.modal_close_btn}
-              onClick={() =>
-                modifyWorktime(editDate, editStartTime, editEndTime)
-              }
+              onClick={() => {
+                rowData.id
+                  ? modifyWorktime(
+                      editDate,
+                      editAttendanceTime,
+                      rowData.id,
+                      attendanceStatus
+                    )
+                  : modifyWorktime(
+                      editDate,
+                      editAttendanceTime,
+                      attendanceStatus
+                    );
+              }}
             >
-              수정
+              확인
             </button>
             <button
               className={styles.modal_close_btn}
