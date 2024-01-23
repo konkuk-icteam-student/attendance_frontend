@@ -27,7 +27,6 @@ function Table({ columns, data, onEditClick }) {
       <tbody {...getTableBodyProps()}>
         {rows.map((row, rowIdx) => {
           prepareRow(row);
-
           return (
             <tr
               key={rowIdx}

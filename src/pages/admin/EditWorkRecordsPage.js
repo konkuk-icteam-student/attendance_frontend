@@ -4,7 +4,7 @@ import Table from "../../component/Table";
 import ModalComponent from "../../component/Modal";
 import dayjs from "dayjs";
 import client from "../../util/clients";
-
+import ExportCSV from "../../component/ExportCSV";
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -20,6 +20,8 @@ function EditWorkRecords() {
   const [studentList, setStudentList] = useState([]);
   //근로 시간 데이터 세팅
   const [workTimeData, setWorkTimeData] = useState([]);
+  const groupedData = [];
+
   const TableColumns = [
     {
       accessor: "arriveAttendance.attendanceDate",
@@ -33,15 +35,24 @@ function EditWorkRecords() {
       accessor: "leaveAttendance.attendanceTime",
       Header: "퇴근",
     },
+    {
+      accessor: "workDuration",
+      Header: "근로시간",
+    },
   ];
-
-  const total_work_hours = 32.5;
+  const CSVHeaders = [
+    { label: "날짜", key: "arriveAttendance.attendanceDate" },
+    { label: "출근", key: "arriveAttendance.attendanceTime" },
+    { label: "퇴근", key: "leaveAttendance.attendanceTime" },
+    { label: "근로시간", key: "workDuration" },
+  ];
   const handleSelectRow = (rowData) => {
     setSelectedRowData(rowData);
     // setModalOpen(true);
     console.log("editworkrecord:??", rowData);
   };
   const modifyWorktime = async (data) => {
+    //api 요청시 필요한 형식에 맞게 body 수정
     const arriveBody = {
       attendanceDate: data.arriveAttendance.attendanceDate,
 
@@ -52,7 +63,7 @@ function EditWorkRecords() {
         ":00.000",
       status: data.arriveAttendance.status,
     };
-    console.log("body data", arriveBody);
+    //api 요청시 필요한 형식에 맞게 body 수정
     const leaveBody = {
       attendanceDate: data.arriveAttendance.attendanceDate,
 
@@ -63,17 +74,24 @@ function EditWorkRecords() {
         ":00.000",
       status: data.leaveAttendance.status,
     };
-    console.log("body data", leaveBody);
+    //출근 시간 수정 api 호출
     await client
       .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
       .then((res) => {
         console.log("res", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
       });
+    //퇴근 시간 수정 api 호출
     await client
       .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
       .then((res) => {
         console.log("res", res);
         alert("수정되었습니다.");
+      })
+      .catch((err) => {
+        console.log("err", err);
       });
 
     setEditModalOpen(false);
@@ -92,9 +110,14 @@ function EditWorkRecords() {
       status: attendanceStatus,
     };
     console.log("body", body);
-    await client.post(`/user/admin-attendance`, body).then((res) => {
-      console.log("res", res);
-    });
+    await client
+      .post(`/user/admin-attendance`, body)
+      .then((res) => {
+        console.log("res", res);
+      })
+      .catch((err) => {
+        console.log("err", err);
+      });
     setAddModalOpen(false);
   };
   //부서에 속한 학생 목록 가져오기 (현재는 1번 부서)
@@ -112,7 +135,6 @@ function EditWorkRecords() {
     await client.delete(
       `/user/attendance/${selectedRowData.leaveAttendance.id}`
     );
-
     await client
       .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
       .then(alert("삭제되었습니다."));
@@ -121,16 +143,12 @@ function EditWorkRecords() {
   const handleSelectStudent = async (event) => {
     setSelectedStudentId(event.target.value);
 
-    // console.log("event.target.value", event.target.value);
-    // setWorkTimeData(dummydata);
-
     //추후 개발 건의: default year, month는 2024년 1월(Dayjs써서 현시점으로 세팅하고, 사용자가 조작할 수 있는 UI추가하면 좋을듯)
     await client
       .get(`/user/attendance/monthly/${event.target.value}?year=2024&month=1`)
       .then((res) => {
         console.log("res.data", res.data);
 
-        const groupedData = [];
         var groupedItem = {};
         res.data.forEach((item, index) => {
           groupedItem = {
@@ -147,11 +165,13 @@ function EditWorkRecords() {
                 "HH:mm"
               ),
             },
+            workDuration: item.workDuration.substring(2),
           };
           groupedData.push(groupedItem);
         });
 
         setWorkTimeData(groupedData);
+        console.log("worktimedata?????", groupedData);
       });
   };
   useEffect(() => {
@@ -205,53 +225,64 @@ function EditWorkRecords() {
             </select>
           </div>
         </div>
-
-        <div className="row">
-          <Table
-            columns={TableColumns}
-            data={workTimeData}
-            onEditClick={handleSelectRow}
-          />
-          <div className="row justify-content-end mt-3">
-            총 근로: {total_work_hours}시간
-          </div>
-          <div className="row justify-content-end mt-3">
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              style={{ width: "25%" }}
-              onClick={() => {
-                setEditModalOpen(true);
-              }}
-              disabled={!selectedRowData}
-            >
-              Edit
-            </button>
-          </div>
-          <div className="row justify-content-end mt-3">
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              style={{ width: "25%" }}
-              onClick={() => {
-                setAddModalOpen(true);
-              }}
-            >
-              Add
-            </button>
-          </div>
-          <div className="row justify-content-end mt-3">
-            <button
-              className="btn btn-outline-secondary"
-              type="button"
-              style={{ width: "25%" }}
-              onClick={handleDeleteButtonClick}
-              disabled={!selectedRowData}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+        {
+          //선택된 학생이 있을 때만 근로 시간 데이터 띄우기
+          selectedStudentId ? (
+            <div className="row">
+              <Table
+                columns={TableColumns}
+                data={workTimeData}
+                onEditClick={handleSelectRow}
+              />
+              {/* <div className="row justify-content-end mt-3">
+      총 근로: 시간
+    </div> */}
+              <div className="row justify-content-end mt-3">
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  style={{ width: "25%" }}
+                  onClick={() => {
+                    setEditModalOpen(true);
+                  }}
+                  disabled={!selectedRowData}
+                >
+                  Edit
+                </button>
+              </div>
+              <div className="row justify-content-end mt-3">
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  style={{ width: "25%" }}
+                  onClick={() => {
+                    setAddModalOpen(true);
+                  }}
+                >
+                  Add
+                </button>
+              </div>
+              <div className="row justify-content-end mt-3">
+                <button
+                  className="btn btn-outline-secondary"
+                  type="button"
+                  style={{ width: "25%" }}
+                  onClick={handleDeleteButtonClick}
+                  disabled={!selectedRowData}
+                >
+                  Delete
+                </button>
+              </div>
+              <div className="row justify-content-end mt-3">
+                <ExportCSV data={workTimeData} headers={CSVHeaders} />
+              </div>
+            </div>
+          ) : (
+            <div className="row justify-content-center mt-3">
+              학생을 선택해주세요.
+            </div>
+          )
+        }
       </div>
     </>
   );
