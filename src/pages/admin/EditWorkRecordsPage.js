@@ -7,19 +7,22 @@ import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
+  //모달 오픈 여부
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   //선택된 학생 이름
   const [selectedStudentValue, setSelectedStudentValue] = useState(null);
   //선택된 학생 아이디(학번)
   const [selectedStudentId, setSelectedStudentId] = useState(null);
-
   //선택된 row
   const [selectedRowData, setSelectedRowData] = useState(null);
   //근로 학생 리스트
   const [studentList, setStudentList] = useState([]);
   //근로 시간 데이터 세팅
   const [workTimeData, setWorkTimeData] = useState([]);
+  //현재 날짜
+  let now = dayjs();
+  //근로 시간 데이터 임시 저장소(학생을 선택할 때마다 초기화, 백엔드에서 받아온 데이터 정제 필요해서 만듦)
   const groupedData = [];
 
   const TableColumns = [
@@ -49,7 +52,6 @@ function EditWorkRecords() {
   const handleSelectRow = (rowData) => {
     setSelectedRowData(rowData);
     // setModalOpen(true);
-    console.log("editworkrecord:??", rowData);
   };
   const modifyWorktime = async (data) => {
     //api 요청시 필요한 형식에 맞게 body 수정
@@ -87,8 +89,8 @@ function EditWorkRecords() {
     await client
       .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
       .then((res) => {
-        console.log("res", res);
         alert("수정되었습니다.");
+        handleSelectStudent({ target: { value: selectedStudentId } });
       })
       .catch((err) => {
         console.log("err", err);
@@ -113,7 +115,8 @@ function EditWorkRecords() {
     await client
       .post(`/user/admin-attendance`, body)
       .then((res) => {
-        console.log("res", res);
+        alert("추가되었습니다.");
+        handleSelectStudent({ target: { value: selectedStudentId } });
       })
       .catch((err) => {
         console.log("err", err);
@@ -138,40 +141,77 @@ function EditWorkRecords() {
     await client
       .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
       .then(alert("삭제되었습니다."));
+    handleSelectStudent({ target: { value: selectedStudentId } });
   };
   //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
   const handleSelectStudent = async (event) => {
     setSelectedStudentId(event.target.value);
 
-    //추후 개발 건의: default year, month는 2024년 1월(Dayjs써서 현시점으로 세팅하고, 사용자가 조작할 수 있는 UI추가하면 좋을듯)
+    //추후 개발 건의: default year, month는 dayjs써서 현시점으로 세팅했음, 추후에 사용자가 조작할 수 있는 UI추가하면 좋을듯)
     await client
-      .get(`/user/attendance/monthly/${event.target.value}?year=2024&month=1`)
+      .get(
+        `/user/attendance/monthly/${event.target.value}?year=${now.get(
+          "y"
+        )}&month=${now.get("month") + 1}`
+      )
       .then((res) => {
         console.log("res.data", res.data);
 
         var groupedItem = {};
         res.data.forEach((item, index) => {
-          groupedItem = {
-            ...item,
-            arriveAttendance: {
-              ...item.arriveAttendance,
-              attendanceTime: dayjs(
-                item.arriveAttendance.attendanceTime
-              ).format("HH:mm"),
-            },
-            leaveAttendance: {
-              ...item.leaveAttendance,
-              attendanceTime: dayjs(item.leaveAttendance.attendanceTime).format(
-                "HH:mm"
-              ),
-            },
-            workDuration: item.workDuration.substring(2),
-          };
+          if (item.arriveAttendance == null) {
+            groupedItem = {
+              ...item,
+              arriveAttendance: {
+                ...item.arriveAttendance,
+                attendanceTime: undefined,
+              },
+              leaveAttendance: {
+                ...item.leaveAttendance,
+                attendanceTime: dayjs(
+                  item.leaveAttendance.attendanceTime
+                ).format("HH:mm"),
+              },
+              workDuration: null,
+            };
+          } else if (item.leaveAttendance == null) {
+            groupedItem = {
+              ...item,
+              arriveAttendance: {
+                ...item.arriveAttendance,
+                attendanceTime: dayjs(
+                  item.arriveAttendance.attendanceTime
+                ).format("HH:mm"),
+              },
+              leaveAttendance: {
+                ...item.leaveAttendance,
+                attendanceTime: undefined,
+              },
+              workDuration: null,
+            };
+          } else {
+            groupedItem = {
+              ...item,
+              arriveAttendance: {
+                ...item.arriveAttendance,
+                attendanceTime: dayjs(
+                  item.arriveAttendance.attendanceTime
+                ).format("HH:mm"),
+              },
+              leaveAttendance: {
+                ...item.leaveAttendance,
+                attendanceTime: dayjs(
+                  item.leaveAttendance.attendanceTime
+                ).format("HH:mm"),
+              },
+              workDuration: item.workDuration.substring(2),
+            };
+          }
+
           groupedData.push(groupedItem);
         });
 
         setWorkTimeData(groupedData);
-        console.log("worktimedata?????", groupedData);
       });
   };
   useEffect(() => {
@@ -210,7 +250,9 @@ function EditWorkRecords() {
               aria-label="Default select example"
               onChange={handleSelectStudent}
             >
-              <option defaultValue="학생">학생</option>
+              <option value="" disabled selected>
+                학생 선택
+              </option>
 
               {
                 //학생 목록 띄우기
