@@ -34,44 +34,7 @@ function EditWorkRecords() {
       Header: "퇴근",
     },
   ];
-  const dummydata = [
-    {
-      arriveAttendance: {
-        id: 29,
-        attendanceTime: "2024-01-21T15:10:08",
-        attendanceDate: "2024-01-21",
-        createId: null,
-        createTime: null,
-        status: "출근",
-      },
-      leaveAttendance: {
-        id: 28,
-        attendanceTime: "2024-01-21T16:10:08",
-        attendanceDate: "2024-01-21",
-        createId: null,
-        createTime: null,
-        status: "퇴근",
-      },
-    },
-    {
-      arriveAttendance: {
-        id: 30,
-        attendanceTime: "2024-01-23T15:10:08",
-        attendanceDate: "2024-01-23",
-        createId: null,
-        createTime: null,
-        status: "출근",
-      },
-      leaveAttendance: {
-        id: 31,
-        attendanceTime: "2024-01-23T16:11:08",
-        attendanceDate: "2024-01-23",
-        createId: null,
-        createTime: null,
-        status: "퇴근",
-      },
-    },
-  ];
+
   const total_work_hours = 32.5;
   const handleSelectRow = (rowData) => {
     setSelectedRowData(rowData);
@@ -79,18 +42,39 @@ function EditWorkRecords() {
     console.log("editworkrecord:??", rowData);
   };
   const modifyWorktime = async (data) => {
-    // const body = {
-    //   attendanceDate: editDate.format("YYYY-MM-DD"),
+    const arriveBody = {
+      attendanceDate: data.arriveAttendance.attendanceDate,
 
-    //   attendanceTime:
-    //     editDate.format("YYYY-MM-DD") + " " + editAttendanceTime + ":00.000",
-    //   userId: selectedStudentId,
-    //   status: attendanceStatus,
-    // };
-    console.log("body", data);
-    await client.put(`/user/attendance`, data).then((res) => {
-      console.log("res", res);
-    });
+      attendanceTime:
+        data.arriveAttendance.attendanceDate +
+        " " +
+        data.arriveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
+        ":00.000",
+      status: data.arriveAttendance.status,
+    };
+    console.log("body data", arriveBody);
+    const leaveBody = {
+      attendanceDate: data.arriveAttendance.attendanceDate,
+
+      attendanceTime:
+        data.leaveAttendance.attendanceDate +
+        " " +
+        data.leaveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
+        ":00.000",
+      status: data.leaveAttendance.status,
+    };
+    console.log("body data", leaveBody);
+    await client
+      .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
+      .then((res) => {
+        console.log("res", res);
+      });
+    await client
+      .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
+      .then((res) => {
+        console.log("res", res);
+        alert("수정되었습니다.");
+      });
 
     setEditModalOpen(false);
   };
@@ -125,8 +109,12 @@ function EditWorkRecords() {
     console.log("studentList", studentList);
   };
   const handleDeleteButtonClick = async () => {
+    await client.delete(
+      `/user/attendance/${selectedRowData.leaveAttendance.id}`
+    );
+
     await client
-      .delete(`/user/attendance/${selectedRowData.id}`)
+      .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
       .then(alert("삭제되었습니다."));
   };
   //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
@@ -142,37 +130,28 @@ function EditWorkRecords() {
       .then((res) => {
         console.log("res.data", res.data);
 
-        // const groupedData = [];
-        // var groupedItem = {};
-        // res.data.forEach((item, index) => {
-        //   if (item.status == "출근") {
-        //     groupedItem = {
-        //       ...item,
-        //       startTime: item.attendanceTime,
-        //       endTime: undefined,
-        //       formatStartTime: dayjs(item.attendanceTime).format("HH:mm"),
-        //       formatEndTime: undefined,
-        //     };
-        //   } else if (item.status == "퇴근") {
-        //     groupedItem = {
-        //       ...item,
-        //       startTime: undefined,
-        //       endTime: item.attendanceTime,
-        //       formatStartTime: undefined,
-        //       formatEndTime: dayjs(item.attendanceTime).format("HH:mm"),
-        //     };
-        //   } else {
-        //     groupedItem = {
-        //       ...item,
-        //       startTime: undefined,
-        //       endTime: undefined,
-        //       formatStartTime: undefined,
-        //       formatEndTime: undefined,
-        //     };
-        //   }
-        //   groupedData.push(groupedItem);
-        // });
-        setWorkTimeData(res.data);
+        const groupedData = [];
+        var groupedItem = {};
+        res.data.forEach((item, index) => {
+          groupedItem = {
+            ...item,
+            arriveAttendance: {
+              ...item.arriveAttendance,
+              attendanceTime: dayjs(
+                item.arriveAttendance.attendanceTime
+              ).format("HH:mm"),
+            },
+            leaveAttendance: {
+              ...item.leaveAttendance,
+              attendanceTime: dayjs(item.leaveAttendance.attendanceTime).format(
+                "HH:mm"
+              ),
+            },
+          };
+          groupedData.push(groupedItem);
+        });
+
+        setWorkTimeData(groupedData);
       });
   };
   useEffect(() => {
@@ -230,7 +209,7 @@ function EditWorkRecords() {
         <div className="row">
           <Table
             columns={TableColumns}
-            data={dummydata}
+            data={workTimeData}
             onEditClick={handleSelectRow}
           />
           <div className="row justify-content-end mt-3">

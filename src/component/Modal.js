@@ -77,20 +77,30 @@ const ModalComponent = React.memo(
           )}
 
           <div className={styles.btn_wrapper}>
-            <button
-              className={styles.modal_close_btn}
-              onClick={() => {
-                rowData.id
-                  ? modifyWorktime(editAttendanceTime)
-                  : modifyWorktime(
-                      editDate,
-                      editAttendanceTime,
-                      attendanceStatus
-                    );
-              }}
-            >
-              확인
-            </button>
+            {title == "근로 시간 수정" ? (
+              <button
+                className={styles.modal_close_btn}
+                onClick={() => {
+                  modifyWorktime(editAttendanceTime);
+                }}
+              >
+                확인
+              </button>
+            ) : (
+              <button
+                className={styles.modal_close_btn}
+                onClick={() => {
+                  modifyWorktime(
+                    editDate,
+                    editAttendanceTime,
+                    attendanceStatus
+                  );
+                }}
+              >
+                확인
+              </button>
+            )}
+
             <button
               className={styles.modal_close_btn}
               onClick={() => onClose()}
