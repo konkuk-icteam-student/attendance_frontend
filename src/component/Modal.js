@@ -5,7 +5,7 @@ import MultiTimePickerModal from "../component/MultiTimePickerModal";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 const ModalComponent = React.memo(
-  ({ title, rowData, onClose, modifyWorktime }) => {
+  ({ title, rowData, onClose, modifyWorktime, select }) => {
     const modalBackground = useRef();
     const [modalOpen, setModalOpen] = useState(false);
     const [editDate, setEditDate] = useState(dayjs(rowData.date));
@@ -31,13 +31,19 @@ const ModalComponent = React.memo(
     };
     const handleNewAttendanceData = (data) => {
       setEditAttendanceTime(data);
-      console.log("dnewnewneata", data);
+      console.log(
+        "newData setting: modal.js의 handleNewAttendanceData에서 호출됨",
+        data
+      );
     };
     const handleEditDate = (data) => {
       setEditDate(data);
     };
     const handleEditTime = (data) => {
-      console.log("etstdata", data);
+      console.log(
+        "editData setting: modal.js의 handleEditTime에서 호출됨",
+        data
+      );
       setEditAttendanceTime(dayjs(data).format("HH:mm"));
     };
     const handleAttendanceStatus = (attendanceStatus) => {
@@ -66,6 +72,7 @@ const ModalComponent = React.memo(
             <MultiTimePickerModal
               defaultdata={rowData}
               updatedTimeData={handleNewAttendanceData}
+              select={select}
             />
           ) : (
             <TimePickerModal

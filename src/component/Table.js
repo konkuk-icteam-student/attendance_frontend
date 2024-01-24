@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTable } from "react-table";
-
-function Table({ columns, data, onEditClick }) {
+import styles from "../css/Table.module.css";
+function Table({ columns, data, onEditClick, flag }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
   const [selectedRow, setSelectedRow] = useState(null);
@@ -11,6 +11,9 @@ function Table({ columns, data, onEditClick }) {
   };
   const handleRadioChange = (rowId) => {
     setSelectedRow(rowId);
+  };
+  const handleFieldClick = (selectedColHeader) => {
+    flag(selectedColHeader);
   };
   return (
     <table className="table" {...getTableProps()}>
@@ -45,7 +48,26 @@ function Table({ columns, data, onEditClick }) {
                 />
               </td>
               {row.cells.map((cell) => (
-                <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                <td
+                  className={
+                    cell.column.id === "arriveAttendance.attendanceTime" ||
+                    cell.column.id === "leaveAttendance.attendanceTime"
+                      ? styles.hoverable_cell
+                      : ""
+                  }
+                  onClick={() => {
+                    if (
+                      cell.column.id === "arriveAttendance.attendanceTime" ||
+                      cell.column.id === "leaveAttendance.attendanceTime"
+                    ) {
+                      handleRowClick(row);
+                      handleFieldClick(cell.column.Header);
+                    }
+                  }}
+                  {...cell.getCellProps()}
+                >
+                  {cell.render("Cell")}
+                </td>
               ))}
             </tr>
           );

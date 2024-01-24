@@ -20,6 +20,9 @@ function EditWorkRecords() {
   const [studentList, setStudentList] = useState([]);
   //근로 시간 데이터 세팅
   const [workTimeData, setWorkTimeData] = useState([]);
+  //출근, 퇴근, 날짜 중 어떤 것을 선택했는지 알기위한 flag
+  // const [flag, setFlag] = useState(null);
+  const flag = "null";
   //현재 날짜
   let now = dayjs();
   //근로 시간 데이터 임시 저장소(학생을 선택할 때마다 초기화, 백엔드에서 받아온 데이터 정제 필요해서 만듦)
@@ -28,6 +31,7 @@ function EditWorkRecords() {
   const TableColumns = [
     {
       accessor: "arriveAttendance.attendanceDate",
+
       Header: "날짜",
     },
     {
@@ -49,11 +53,18 @@ function EditWorkRecords() {
     { label: "퇴근", key: "leaveAttendance.attendanceTime" },
     { label: "근로시간", key: "workDuration" },
   ];
+  //테이블에서 row 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
     setSelectedRowData(rowData);
-    // setModalOpen(true);
+    setEditModalOpen(true);
   };
-  const modifyWorktime = async (data) => {
+  const handleSelectedColHeader = (selectedColHeader) => {
+    flag = selectedColHeader;
+    console.log("flag", selectedColHeader);
+  };
+  /**Modal에서 시간이 수정된 데이터를 받아와서 api 호출
+  근로 시간 수정 모달의 edit 확인 버튼 클릭시 호출됨**/
+  const handleModalEditClick = async (data) => {
     //api 요청시 필요한 형식에 맞게 body 수정
     const arriveBody = {
       attendanceDate: data.arriveAttendance.attendanceDate,
@@ -63,7 +74,7 @@ function EditWorkRecords() {
         " " +
         data.arriveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
         ":00.000",
-      status: data.arriveAttendance.status,
+      status: 1,
     };
     //api 요청시 필요한 형식에 맞게 body 수정
     const leaveBody = {
@@ -74,8 +85,9 @@ function EditWorkRecords() {
         " " +
         data.leaveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
         ":00.000",
-      status: data.leaveAttendance.status,
+      status: 0,
     };
+    console.log("arriveBody", arriveBody);
     //출근 시간 수정 api 호출
     await client
       .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
@@ -98,7 +110,8 @@ function EditWorkRecords() {
 
     setEditModalOpen(false);
   };
-  const addWorktime = async (
+  //근로 시간 추가 api 호출
+  const handleModalAddClick = async (
     editDate,
     editAttendanceTime,
     attendanceStatus
@@ -109,7 +122,7 @@ function EditWorkRecords() {
       attendanceTime:
         editDate.format("YYYY-MM-DD") + " " + editAttendanceTime + ":00.000",
       userId: selectedStudentId,
-      status: attendanceStatus,
+      status: attendanceStatus == "출근" ? 1 : 0,
     };
     console.log("body", body);
     await client
@@ -134,6 +147,7 @@ function EditWorkRecords() {
     });
     console.log("studentList", studentList);
   };
+  //근로 시간 삭제 api 호출
   const handleDeleteButtonClick = async () => {
     await client.delete(
       `/user/attendance/${selectedRowData.leaveAttendance.id}`
@@ -141,8 +155,10 @@ function EditWorkRecords() {
     await client
       .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
       .then(alert("삭제되었습니다."));
+
     handleSelectStudent({ target: { value: selectedStudentId } });
   };
+
   //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
   const handleSelectStudent = async (event) => {
     setSelectedStudentId(event.target.value);
@@ -214,9 +230,17 @@ function EditWorkRecords() {
         setWorkTimeData(groupedData);
       });
   };
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   useEffect(() => {
     console.log("?");
-    fetchStudentList();
+    // fetchStudentList();
+    const fetchStudentAndData = async () => {
+      await fetchStudentList();
+      setIsDataLoaded(true);
+    };
+
+    fetchStudentAndData();
   }, []);
 
   return (
@@ -229,7 +253,8 @@ function EditWorkRecords() {
             title="근로 시간 수정"
             rowData={selectedRowData}
             onClose={() => setEditModalOpen(false)}
-            modifyWorktime={modifyWorktime}
+            modifyWorktime={handleModalEditClick}
+            select={flag}
           />
         )}
         {/* 근로 시간 새로 추가하는 모달 */}
@@ -238,7 +263,7 @@ function EditWorkRecords() {
             title="근로 시간 추가"
             rowData={dayjs("2024-01-01T09:00")}
             onClose={() => setAddModalOpen(false)}
-            modifyWorktime={addWorktime}
+            modifyWorktime={handleModalAddClick}
           />
         )}
       </div>
@@ -275,6 +300,7 @@ function EditWorkRecords() {
                 columns={TableColumns}
                 data={workTimeData}
                 onEditClick={handleSelectRow}
+                flag={handleSelectedColHeader}
               />
               {/* <div className="row justify-content-end mt-3">
       총 근로: 시간
