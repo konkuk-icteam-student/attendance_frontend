@@ -1,9 +1,6 @@
 import Button from "@mui/material/Button";
 import { CSVLink } from "react-csv";
 function ExportCSV(data) {
-  console.log("exportCSV", data.data);
-  console.log("exportCSV", data.headers);
-
   return (
     <div className="row justify-content-end mt-3">
       <button

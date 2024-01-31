@@ -13,7 +13,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
-function CustomModal({ defaultdata, updatedTimeData, select }) {
+function CustomModal({ defaultdata, updatedTimeData, selectedHeader }) {
   const [UpdatedAttendanceData, setUpdateAttendanceData] =
     useState(defaultdata);
 
@@ -43,29 +43,55 @@ function CustomModal({ defaultdata, updatedTimeData, select }) {
     },
   };
   const handleEditTime = (data) => {
-    const updatedData = {
-      ...UpdatedAttendanceData,
-      arriveAttendance: {
-        ...UpdatedAttendanceData.arriveAttendance,
-        attendanceTime:
-          UpdatedAttendanceData.arriveAttendance.attendanceDate +
-          "T" +
-          dayjs(data[0]).format("HH:mm") +
-          ":00.000",
-      },
-      leaveAttendance: {
-        ...UpdatedAttendanceData.leaveAttendance,
-        attendanceTime:
-          UpdatedAttendanceData.leaveAttendance.attendanceDate +
-          "T" +
-          dayjs(data[1]).format("HH:mm") +
-          ":00.000",
-      },
-    };
-    setUpdateAttendanceData(updatedData);
-    updatedTimeData(updatedData);
+    if (selectedHeader === "출근") {
+      const updatedData = {
+        ...UpdatedAttendanceData,
+        arriveAttendance: {
+          ...UpdatedAttendanceData.arriveAttendance,
+          attendanceTime:
+            UpdatedAttendanceData.arriveAttendance.attendanceDate +
+            "T" +
+            dayjs(data).format("HH:mm") +
+            ":00.000",
+        },
+        // leaveAttendance: {
+        //   ...UpdatedAttendanceData.leaveAttendance,
+        //   attendanceTime:
+        //     UpdatedAttendanceData.leaveAttendance.attendanceDate +
+        //     "T" +
+        //     dayjs(data).format("HH:mm") +
+        //     ":00.000",
+        // },
+      };
+      setUpdateAttendanceData(updatedData);
+      updatedTimeData(updatedData);
+      console.log("updatedData", updatedData);
+    } else {
+      const updatedData = {
+        ...UpdatedAttendanceData,
+        // arriveAttendance: {
+        //   ...UpdatedAttendanceData.arriveAttendance,
+        //   attendanceTime:
+        //     UpdatedAttendanceData.arriveAttendance.attendanceDate +
+        //     "T" +
+        //     dayjs(data).format("HH:mm") +
+        //     ":00.000",
+        // },
+        leaveAttendance: {
+          ...UpdatedAttendanceData.leaveAttendance,
+          attendanceTime:
+            UpdatedAttendanceData.leaveAttendance.attendanceDate +
+            "T" +
+            dayjs(data).format("HH:mm") +
+            ":00.000",
+        },
+      };
+      setUpdateAttendanceData(updatedData);
+      updatedTimeData(updatedData);
+    }
   };
   const handleEditDate = (data) => {
+    console.log("date", data);
     const updatedData = {
       ...UpdatedAttendanceData,
       arriveAttendance: {
@@ -91,7 +117,7 @@ function CustomModal({ defaultdata, updatedTimeData, select }) {
     updatedTimeData(updatedData);
   };
   useEffect(() => {
-    console.log("select?", select);
+    console.log("select???", selectedHeader);
     // console.log(
     //   defaultdata.arriveAttendance.attendanceDate +
     //     "T" +
@@ -111,7 +137,7 @@ function CustomModal({ defaultdata, updatedTimeData, select }) {
         onChange={(data) => {
           handleEditDate(data);
         }}
-        disabled={select !== 1}
+        disabled={selectedHeader !== "날짜"}
       />
       <DemoContainer
         components={[
@@ -123,38 +149,38 @@ function CustomModal({ defaultdata, updatedTimeData, select }) {
           "MultiInputDateTimeRangeField",
         ]}
       >
-        <br />
+        &nbsp;
         <TimePicker
           label="출근 time picker"
-          defaultValue={
-            defaultdata.arriveAttendance.attendanceTime
-              ? defaultdata.arriveAttendance.attendanceDate +
-                "T" +
-                defaultdata.arriveAttendance.attendanceTime
-              : undefined
-          }
+          // defaultValue={
+          //   defaultdata.arriveAttendance.attendanceTime
+          //     ? defaultdata.arriveAttendance.attendanceDate +
+          //       "T" +
+          //       defaultdata.arriveAttendance.attendanceTime
+          //     : undefined
+          // }
           onChange={(data) => {
+            console.log("timedata", data);
             // dateChange(data);
-
             handleEditTime(data);
           }}
-          disabled={select !== 2}
+          disabled={selectedHeader !== "출근"}
         />
         <TimePicker
           label="퇴근 time picker"
-          defaultValue={
-            defaultdata.leaveAttendance.attendanceTime
-              ? defaultdata.leaveAttendance.attendanceDate +
-                "T" +
-                defaultdata.leaveAttendance.attendanceTime
-              : undefined
-          }
+          // defaultValue={
+          //   defaultdata.leaveAttendance.attendanceTime
+          //     ? defaultdata.leaveAttendance.attendanceDate +
+          //       "T" +
+          //       defaultdata.leaveAttendance.attendanceTime
+          //     : undefined
+          // }
           onChange={(data) => {
             // dateChange(data);
 
             handleEditTime(data);
           }}
-          disabled={select !== 3}
+          disabled={selectedHeader !== "퇴근"}
         />
         {/* <MultiInputTimeRangeField
           defaultValue={[

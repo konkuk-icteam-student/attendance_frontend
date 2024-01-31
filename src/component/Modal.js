@@ -5,7 +5,7 @@ import MultiTimePickerModal from "../component/MultiTimePickerModal";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 const ModalComponent = React.memo(
-  ({ title, rowData, onClose, modifyWorktime, select }) => {
+  ({ title, rowData, onClose, modifyWorktime, selectedHeader }) => {
     const modalBackground = useRef();
     const [modalOpen, setModalOpen] = useState(false);
     const [editDate, setEditDate] = useState(dayjs(rowData.date));
@@ -51,7 +51,7 @@ const ModalComponent = React.memo(
       setAttendanceStatus(attendanceStatus);
     };
     useEffect(() => {
-      console.log("data", rowData);
+      console.log("selectedHeader22", selectedHeader);
       console.log("starttime", editDate.format("YYYY-MM-DD"));
     });
     return (
@@ -72,7 +72,7 @@ const ModalComponent = React.memo(
             <MultiTimePickerModal
               defaultdata={rowData}
               updatedTimeData={handleNewAttendanceData}
-              select={select}
+              selectedHeader={selectedHeader}
             />
           ) : (
             <TimePickerModal

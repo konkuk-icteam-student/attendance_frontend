@@ -21,10 +21,12 @@ function EditWorkRecords() {
   //근로 시간 데이터 세팅
   const [workTimeData, setWorkTimeData] = useState([]);
   //출근, 퇴근, 날짜 중 어떤 것을 선택했는지 알기위한 flag
-  // const [flag, setFlag] = useState(null);
-  const flag = "null";
+  const [flag, setFlag] = useState(null);
+  // const flag = "null";
   //현재 날짜
   let now = dayjs();
+  //총 근로시간
+  var TotalWorkTime = "0";
   //근로 시간 데이터 임시 저장소(학생을 선택할 때마다 초기화, 백엔드에서 받아온 데이터 정제 필요해서 만듦)
   const groupedData = [];
 
@@ -59,55 +61,61 @@ function EditWorkRecords() {
     setEditModalOpen(true);
   };
   const handleSelectedColHeader = (selectedColHeader) => {
-    flag = selectedColHeader;
-    console.log("flag", selectedColHeader);
+    setFlag(selectedColHeader);
+    console.log("flag?", flag);
   };
   /**Modal에서 시간이 수정된 데이터를 받아와서 api 호출
   근로 시간 수정 모달의 edit 확인 버튼 클릭시 호출됨**/
   const handleModalEditClick = async (data) => {
-    //api 요청시 필요한 형식에 맞게 body 수정
-    const arriveBody = {
-      attendanceDate: data.arriveAttendance.attendanceDate,
+    console.log(data, flag);
+    if (flag == "출근") {
+      //api 요청시 필요한 형식에 맞게 body 수정
 
-      attendanceTime:
-        data.arriveAttendance.attendanceDate +
-        " " +
-        data.arriveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
-        ":00.000",
-      status: 1,
-    };
-    //api 요청시 필요한 형식에 맞게 body 수정
-    const leaveBody = {
-      attendanceDate: data.arriveAttendance.attendanceDate,
+      const arriveBody = {
+        attendanceDate: data.arriveAttendance.attendanceDate,
 
-      attendanceTime:
-        data.leaveAttendance.attendanceDate +
-        " " +
-        data.leaveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
-        ":00.000",
-      status: 0,
-    };
-    console.log("arriveBody", arriveBody);
-    //출근 시간 수정 api 호출
-    await client
-      .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
-      .then((res) => {
-        console.log("res", res);
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
-    //퇴근 시간 수정 api 호출
-    await client
-      .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
-      .then((res) => {
-        alert("수정되었습니다.");
-        handleSelectStudent({ target: { value: selectedStudentId } });
-      })
-      .catch((err) => {
-        console.log("err", err);
-      });
+        attendanceTime:
+          data.arriveAttendance.attendanceDate +
+          " " +
+          data.arriveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
+          ":00.000",
+        status: 1,
+      };
+      console.log("arriveBody", data.arriveAttendance.id, arriveBody);
+      //출근 시간 수정 api 호출
+      await client
+        .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
+        .then((res) => {
+          console.log("res", res);
+        })
+        .catch((err) => {
+          console.log("err", err);
+        });
+    } else if (flag == "퇴근") {
+      //api 요청시 필요한 형식에 맞게 body 수정
+      const leaveBody = {
+        attendanceDate: data.arriveAttendance.attendanceDate,
 
+        attendanceTime:
+          data.leaveAttendance.attendanceDate +
+          " " +
+          data.leaveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
+          ":00.000",
+        status: 0,
+      };
+
+      //퇴근 시간 수정 api 호출
+      await client
+        .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
+        .then((res) => {
+          alert("수정되었습니다.");
+          handleSelectStudent({ target: { value: selectedStudentId } });
+        })
+        .catch((err) => {
+          console.log("err", err);
+        });
+      console.log("leaveBody", leaveBody);
+    }
     setEditModalOpen(false);
   };
   //근로 시간 추가 api 호출
@@ -143,6 +151,7 @@ function EditWorkRecords() {
         alert("해당 부서에 속한 학생이 없습니다.");
       } else {
         setStudentList(res.data.users);
+        console.log("studentListres", res);
       }
     });
     console.log("studentList", studentList);
@@ -172,72 +181,75 @@ function EditWorkRecords() {
       )
       .then((res) => {
         console.log("res.data", res.data);
-
+        TotalWorkTime = res.data.totalDuration;
         var groupedItem = {};
-        res.data.forEach((item, index) => {
-          if (item.arriveAttendance == null) {
-            groupedItem = {
-              ...item,
-              arriveAttendance: {
-                ...item.arriveAttendance,
-                attendanceTime: undefined,
-              },
-              leaveAttendance: {
-                ...item.leaveAttendance,
-                attendanceTime: dayjs(
-                  item.leaveAttendance.attendanceTime
-                ).format("HH:mm"),
-              },
-              workDuration: null,
-            };
-          } else if (item.leaveAttendance == null) {
-            groupedItem = {
-              ...item,
-              arriveAttendance: {
-                ...item.arriveAttendance,
-                attendanceTime: dayjs(
-                  item.arriveAttendance.attendanceTime
-                ).format("HH:mm"),
-              },
-              leaveAttendance: {
-                ...item.leaveAttendance,
-                attendanceTime: undefined,
-              },
-              workDuration: null,
-            };
-          } else {
-            groupedItem = {
-              ...item,
-              arriveAttendance: {
-                ...item.arriveAttendance,
-                attendanceTime: dayjs(
-                  item.arriveAttendance.attendanceTime
-                ).format("HH:mm"),
-              },
-              leaveAttendance: {
-                ...item.leaveAttendance,
-                attendanceTime: dayjs(
-                  item.leaveAttendance.attendanceTime
-                ).format("HH:mm"),
-              },
-              workDuration: item.workDuration.substring(2),
-            };
-          }
+        if (res.data.length == 0) {
+          alert("해당 학생의 근로 데이터가 없습니다.");
+        } else {
+          res.data.attendanceDataList.forEach((item, index) => {
+            if (item.arriveAttendance == null) {
+              groupedItem = {
+                ...item,
+                arriveAttendance: {
+                  ...item.arriveAttendance,
+                  attendanceTime: undefined,
+                },
+                leaveAttendance: {
+                  ...item.leaveAttendance,
+                  attendanceTime: dayjs(
+                    item.leaveAttendance.attendanceTime
+                  ).format("HH:mm"),
+                },
+                workDuration: null,
+              };
+            } else if (item.leaveAttendance == null) {
+              groupedItem = {
+                ...item,
+                arriveAttendance: {
+                  ...item.arriveAttendance,
+                  attendanceTime: dayjs(
+                    item.arriveAttendance.attendanceTime
+                  ).format("HH:mm"),
+                },
+                leaveAttendance: {
+                  ...item.leaveAttendance,
+                  attendanceTime: undefined,
+                },
+                workDuration: null,
+              };
+            } else {
+              groupedItem = {
+                ...item,
+                arriveAttendance: {
+                  ...item.arriveAttendance,
+                  attendanceTime: dayjs(
+                    item.arriveAttendance.attendanceTime
+                  ).format("HH:mm"),
+                },
+                leaveAttendance: {
+                  ...item.leaveAttendance,
+                  attendanceTime: dayjs(
+                    item.leaveAttendance.attendanceTime
+                  ).format("HH:mm"),
+                },
+                workDuration: item.workDuration.substring(2),
+              };
+            }
 
-          groupedData.push(groupedItem);
-        });
+            groupedData.push(groupedItem);
+          });
+        }
 
         setWorkTimeData(groupedData);
       });
   };
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
+  // const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     console.log("?");
-    // fetchStudentList();
     const fetchStudentAndData = async () => {
       await fetchStudentList();
-      setIsDataLoaded(true);
+      // setIsDataLoaded(true);
     };
 
     fetchStudentAndData();
@@ -254,7 +266,7 @@ function EditWorkRecords() {
             rowData={selectedRowData}
             onClose={() => setEditModalOpen(false)}
             modifyWorktime={handleModalEditClick}
-            select={flag}
+            selectedHeader={flag}
           />
         )}
         {/* 근로 시간 새로 추가하는 모달 */}
@@ -302,9 +314,9 @@ function EditWorkRecords() {
                 onEditClick={handleSelectRow}
                 flag={handleSelectedColHeader}
               />
-              {/* <div className="row justify-content-end mt-3">
-      총 근로: 시간
-    </div> */}
+              <div className="row justify-content-end mt-3">
+                총 근로: {TotalWorkTime}
+              </div>
               <div className="row justify-content-end mt-3">
                 <button
                   className="btn btn-outline-secondary"
