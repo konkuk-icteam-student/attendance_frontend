@@ -11,7 +11,7 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Button from "@mui/material/Button";
 
-function CustomModal({
+function TimeAdditionPickers({
   defaultdata,
   dateChange,
   timeChange,
@@ -22,7 +22,7 @@ function CustomModal({
     timeChange(data);
   };
   const handleEditDate = (data) => {
-    dateChange(data);
+    dateChange(data.format("YYYY-MM-DD"));
   };
   const handleAttendanceStatus = (data) => {
     //선택된 버튼 배경색 바꾸기 위해 현재 선택 되어있는 status설정
@@ -91,4 +91,4 @@ function CustomModal({
   );
 }
 
-export default CustomModal;
+export default TimeAdditionPickers;

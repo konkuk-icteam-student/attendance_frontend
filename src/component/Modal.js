@@ -1,19 +1,15 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import styles from "../css/Modal.module.css";
-import TimePickerModal from "../component/TimePickerModal";
-import MultiTimePickerModal from "../component/MultiTimePickerModal";
+import TimeAdditionPickers from "./TimeAdditionPickers";
+import TimeModificationPickers from "./TimeModificationPickers";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 const ModalComponent = React.memo(
   ({ title, rowData, onClose, modifyWorktime, selectedHeader }) => {
     const modalBackground = useRef();
-    const [modalOpen, setModalOpen] = useState(false);
     const [editDate, setEditDate] = useState(dayjs(rowData.date));
     const [attendanceStatus, setAttendanceStatus] = useState();
-    // const [editStartTime, setEditStartTime] = useState(
-    //   dayjs(rowData.startTime)
-    // );
-    // const [editEndTime, setEditEndTime] = useState(dayjs(rowData.endTime));
+
     const [editAttendanceTime, setEditAttendanceTime] = useState(rowData);
     const style = {
       position: "absolute",
@@ -37,23 +33,16 @@ const ModalComponent = React.memo(
       );
     };
     const handleEditDate = (data) => {
+      console.log("handle edatae", data);
       setEditDate(data);
     };
     const handleEditTime = (data) => {
-      console.log(
-        "editData setting: modal.js의 handleEditTime에서 호출됨",
-        data
-      );
       setEditAttendanceTime(dayjs(data).format("HH:mm"));
     };
     const handleAttendanceStatus = (attendanceStatus) => {
-      console.log("attendanceStatus", attendanceStatus);
       setAttendanceStatus(attendanceStatus);
     };
-    useEffect(() => {
-      console.log("selectedHeader22", selectedHeader);
-      console.log("starttime", editDate.format("YYYY-MM-DD"));
-    });
+
     return (
       <div className={styles.modal_container}>
         <Box
@@ -69,13 +58,13 @@ const ModalComponent = React.memo(
           <h2>{title}</h2>
           <br />
           {title == "근로 시간 수정" ? (
-            <MultiTimePickerModal
+            <TimeModificationPickers
               defaultdata={rowData}
               updatedTimeData={handleNewAttendanceData}
               selectedHeader={selectedHeader}
             />
           ) : (
-            <TimePickerModal
+            <TimeAdditionPickers
               defaultdata={rowData}
               dateChange={handleEditDate}
               timeChange={handleEditTime}

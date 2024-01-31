@@ -14,6 +14,7 @@ function Table({ columns, data, onEditClick, flag }) {
   };
   const handleFieldClick = (selectedColHeader) => {
     flag(selectedColHeader);
+    // console.log("selectedColHeader", selectedColHeader);
   };
   return (
     <table className="table" {...getTableProps()}>
@@ -47,28 +48,23 @@ function Table({ columns, data, onEditClick, flag }) {
                   onChange={() => handleRadioChange(row.id)}
                 />
               </td>
-              {row.cells.map((cell) => (
-                <td
-                  className={
-                    cell.column.id === "arriveAttendance.attendanceTime" ||
-                    cell.column.id === "leaveAttendance.attendanceTime"
-                      ? styles.hoverable_cell
-                      : ""
-                  }
-                  onClick={() => {
-                    if (
-                      cell.column.id === "arriveAttendance.attendanceTime" ||
-                      cell.column.id === "leaveAttendance.attendanceTime"
-                    ) {
+              {row.cells.map((cell) =>
+                cell.column.id === "arriveAttendance.attendanceTime" ||
+                cell.column.id === "leaveAttendance.attendanceTime" ? (
+                  <td
+                    className={styles.hoverable_cell}
+                    onClick={() => {
                       handleRowClick(row);
                       handleFieldClick(cell.column.Header);
-                    }
-                  }}
-                  {...cell.getCellProps()}
-                >
-                  {cell.render("Cell")}
-                </td>
-              ))}
+                    }}
+                    {...cell.getCellProps()}
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                ) : (
+                  <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
+                )
+              )}
             </tr>
           );
         })}

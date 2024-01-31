@@ -42,7 +42,7 @@ function Home() {
           >
             <option defaultValue="none">부서선택</option>
             {deptList.map((dept) => {
-              console.log("qntj?", dept.deptName);
+              // console.log("부서리스트?", dept.deptName);
               return (
                 <option key={dept.id} value={dept.id}>
                   {dept.deptName}

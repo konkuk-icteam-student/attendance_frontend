@@ -13,7 +13,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 
-function CustomModal({ defaultdata, updatedTimeData, selectedHeader }) {
+function TimeModificationPickers({
+  defaultdata,
+  updatedTimeData,
+  selectedHeader,
+}) {
   const [UpdatedAttendanceData, setUpdateAttendanceData] =
     useState(defaultdata);
 
@@ -197,4 +201,4 @@ function CustomModal({ defaultdata, updatedTimeData, selectedHeader }) {
   );
 }
 
-export default CustomModal;
+export default TimeModificationPickers;

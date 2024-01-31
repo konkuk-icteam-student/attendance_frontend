@@ -5,6 +5,7 @@ import ModalComponent from "../../component/Modal";
 import dayjs from "dayjs";
 import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
+import { formatTime, formatTimeForServer } from "../../util/stringUtils";
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
   //모달 오픈 여부
@@ -22,11 +23,12 @@ function EditWorkRecords() {
   const [workTimeData, setWorkTimeData] = useState([]);
   //출근, 퇴근, 날짜 중 어떤 것을 선택했는지 알기위한 flag
   const [flag, setFlag] = useState(null);
-  // const flag = "null";
+
   //현재 날짜
   let now = dayjs();
   //총 근로시간
-  var TotalWorkTime = "0";
+  const [TotalWorkTime, setTotalWorkTime] = useState(null);
+
   //근로 시간 데이터 임시 저장소(학생을 선택할 때마다 초기화, 백엔드에서 받아온 데이터 정제 필요해서 만듦)
   const groupedData = [];
 
@@ -58,7 +60,18 @@ function EditWorkRecords() {
   //테이블에서 row 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
     setSelectedRowData(rowData);
-    setEditModalOpen(true);
+    if (
+      rowData.arriveAttendance.attendanceTime == undefined ||
+      rowData.leaveAttendance.attendanceTime == undefined
+    ) {
+      alert("누락된 데이터는 Add 버튼을 통해 추가해주세요.");
+      return;
+    } else if (flag == null) {
+      return;
+    } else {
+      setEditModalOpen(true);
+      return;
+    }
   };
   const handleSelectedColHeader = (selectedColHeader) => {
     setFlag(selectedColHeader);
@@ -68,25 +81,25 @@ function EditWorkRecords() {
   근로 시간 수정 모달의 edit 확인 버튼 클릭시 호출됨**/
   const handleModalEditClick = async (data) => {
     console.log(data, flag);
+
     if (flag == "출근") {
       //api 요청시 필요한 형식에 맞게 body 수정
 
       const arriveBody = {
         attendanceDate: data.arriveAttendance.attendanceDate,
 
-        attendanceTime:
-          data.arriveAttendance.attendanceDate +
-          " " +
-          data.arriveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
-          ":00.000",
+        attendanceTime: formatTimeForServer(
+          data.arriveAttendance.attendanceTime
+        ),
+
         status: 1,
       };
-      console.log("arriveBody", data.arriveAttendance.id, arriveBody);
       //출근 시간 수정 api 호출
       await client
         .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
         .then((res) => {
-          console.log("res", res);
+          alert("수정되었습니다.");
+          handleSelectStudent({ target: { value: selectedStudentId } });
         })
         .catch((err) => {
           console.log("err", err);
@@ -96,14 +109,12 @@ function EditWorkRecords() {
       const leaveBody = {
         attendanceDate: data.arriveAttendance.attendanceDate,
 
-        attendanceTime:
-          data.leaveAttendance.attendanceDate +
-          " " +
-          data.leaveAttendance.attendanceTime.match(/T(\d{2}:\d{2})/)[1] +
-          ":00.000",
+        attendanceTime: formatTimeForServer(
+          data.leaveAttendance.attendanceTime
+        ),
+
         status: 0,
       };
-
       //퇴근 시간 수정 api 호출
       await client
         .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
@@ -114,9 +125,14 @@ function EditWorkRecords() {
         .catch((err) => {
           console.log("err", err);
         });
-      console.log("leaveBody", leaveBody);
+    } else {
+      console.log(
+        "EditWorkRecordsPage.js: 129: flag is null 129번째 줄 확인필요!"
+      );
     }
+
     setEditModalOpen(false);
+    setFlag(null);
   };
   //근로 시간 추가 api 호출
   const handleModalAddClick = async (
@@ -124,11 +140,11 @@ function EditWorkRecords() {
     editAttendanceTime,
     attendanceStatus
   ) => {
+    console.log("editDate", editDate);
     const body = {
-      attendanceDate: editDate.format("YYYY-MM-DD"),
+      attendanceDate: editDate,
 
-      attendanceTime:
-        editDate.format("YYYY-MM-DD") + " " + editAttendanceTime + ":00.000",
+      attendanceTime: editDate + " " + editAttendanceTime + ":00.000",
       userId: selectedStudentId,
       status: attendanceStatus == "출근" ? 1 : 0,
     };
@@ -151,19 +167,35 @@ function EditWorkRecords() {
         alert("해당 부서에 속한 학생이 없습니다.");
       } else {
         setStudentList(res.data.users);
-        console.log("studentListres", res);
+        // const result = res.data.totalDuration.slice(2);
+
+        // setTotalWorkTime(res.data.totalDuration);
+        // console.log("studentListres?", res.data.totalDuration);
       }
     });
-    console.log("studentList", studentList);
+    // console.log("studentList", studentList);
   };
   //근로 시간 삭제 api 호출
   const handleDeleteButtonClick = async () => {
-    await client.delete(
-      `/user/attendance/${selectedRowData.leaveAttendance.id}`
-    );
-    await client
-      .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
-      .then(alert("삭제되었습니다."));
+    if (
+      selectedRowData.arriveAttendance.id &&
+      selectedRowData.leaveAttendance.id
+    ) {
+      await client.delete(
+        `/user/attendance/${selectedRowData.arriveAttendance.id}`
+      );
+      await client
+        .delete(`/user/attendance/${selectedRowData.leaveAttendance.id}`)
+        .then(alert("출/퇴근 기록 삭제되었습니다."));
+    } else if (selectedRowData.arriveAttendance.id) {
+      await client
+        .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
+        .then(alert("출근 기록 삭제되었습니다."));
+    } else if (selectedRowData.leaveAttendance.id) {
+      await client
+        .delete(`/user/attendance/${selectedRowData.leaveAttendance.id}`)
+        .then(alert("퇴근 기록 삭제되었습니다."));
+    }
 
     handleSelectStudent({ target: { value: selectedStudentId } });
   };
@@ -180,8 +212,10 @@ function EditWorkRecords() {
         )}&month=${now.get("month") + 1}`
       )
       .then((res) => {
-        console.log("res.data", res.data);
-        TotalWorkTime = res.data.totalDuration;
+        console.log("res.data", res.data.totalDuration.substring(2));
+
+        setTotalWorkTime(formatTime(res.data.totalDuration));
+
         var groupedItem = {};
         if (res.data.length == 0) {
           alert("해당 학생의 근로 데이터가 없습니다.");
@@ -232,7 +266,7 @@ function EditWorkRecords() {
                     item.leaveAttendance.attendanceTime
                   ).format("HH:mm"),
                 },
-                workDuration: item.workDuration.substring(2),
+                workDuration: formatTime(item.workDuration),
               };
             }
 
@@ -243,10 +277,8 @@ function EditWorkRecords() {
         setWorkTimeData(groupedData);
       });
   };
-  // const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
-    console.log("?");
     const fetchStudentAndData = async () => {
       await fetchStudentList();
       // setIsDataLoaded(true);
@@ -264,7 +296,10 @@ function EditWorkRecords() {
           <ModalComponent
             title="근로 시간 수정"
             rowData={selectedRowData}
-            onClose={() => setEditModalOpen(false)}
+            onClose={() => {
+              setEditModalOpen(false);
+              setFlag(null);
+            }}
             modifyWorktime={handleModalEditClick}
             selectedHeader={flag}
           />
@@ -317,7 +352,7 @@ function EditWorkRecords() {
               <div className="row justify-content-end mt-3">
                 총 근로: {TotalWorkTime}
               </div>
-              <div className="row justify-content-end mt-3">
+              {/* <div className="row justify-content-end mt-3">
                 <button
                   className="btn btn-outline-secondary"
                   type="button"
@@ -329,7 +364,7 @@ function EditWorkRecords() {
                 >
                   Edit
                 </button>
-              </div>
+              </div> */}
               <div className="row justify-content-end mt-3">
                 <button
                   className="btn btn-outline-secondary"
