@@ -14,7 +14,7 @@ function Table({ columns, data, onEditClick, flag }) {
   };
   const handleFieldClick = (selectedColHeader) => {
     flag(selectedColHeader);
-    // console.log("selectedColHeader", selectedColHeader);
+    console.log("selectedColHeader", selectedColHeader);
   };
   return (
     <table className="table" {...getTableProps()}>

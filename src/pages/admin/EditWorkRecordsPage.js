@@ -59,11 +59,9 @@ function EditWorkRecords() {
   ];
   //테이블에서 row 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
+    console.log("rowData", rowData);
     setSelectedRowData(rowData);
-    if (
-      rowData.arriveAttendance.attendanceTime == undefined ||
-      rowData.leaveAttendance.attendanceTime == undefined
-    ) {
+    if (rowData.workDuration == null) {
       alert("누락된 데이터는 Add 버튼을 통해 추가해주세요.");
       return;
     } else if (flag == null) {
@@ -103,6 +101,9 @@ function EditWorkRecords() {
         })
         .catch((err) => {
           console.log("err", err);
+          alert(
+            "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
+          );
         });
     } else if (flag == "퇴근") {
       //api 요청시 필요한 형식에 맞게 body 수정
@@ -124,6 +125,9 @@ function EditWorkRecords() {
         })
         .catch((err) => {
           console.log("err", err);
+          alert(
+            "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
+          );
         });
     } else {
       console.log(
@@ -157,6 +161,9 @@ function EditWorkRecords() {
       })
       .catch((err) => {
         console.log("err", err);
+        alert(
+          "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
+        );
       });
     setAddModalOpen(false);
   };
@@ -212,9 +219,11 @@ function EditWorkRecords() {
         )}&month=${now.get("month") + 1}`
       )
       .then((res) => {
-        console.log("res.data", res.data.totalDuration.substring(2));
-
-        setTotalWorkTime(formatTime(res.data.totalDuration));
+        if (res.data.totalDuration == "PT0S") {
+          setTotalWorkTime("0시간 0분");
+        } else {
+          setTotalWorkTime(formatTime(res.data.totalDuration));
+        }
 
         var groupedItem = {};
         if (res.data.length == 0) {

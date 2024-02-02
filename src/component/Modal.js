@@ -12,9 +12,7 @@ const ModalComponent = React.memo(
 
     const [editAttendanceTime, setEditAttendanceTime] = useState(rowData);
     const style = {
-      position: "absolute",
-      top: "50%",
-      left: "50%",
+      position: "relative",
       transform: "translate(-50%, -50%)",
       width: 400,
       bgcolor: "background.paper",
@@ -24,6 +22,7 @@ const ModalComponent = React.memo(
       px: 4,
       pb: 3,
       borderRadius: "15px",
+      zIndex: 9999, // z-index 값 설정
     };
     const handleNewAttendanceData = (data) => {
       setEditAttendanceTime(data);
@@ -75,7 +74,7 @@ const ModalComponent = React.memo(
           <div className={styles.btn_wrapper}>
             {title == "근로 시간 수정" ? (
               <button
-                className={styles.modal_close_btn}
+                className={`${styles.modal_close_btn} btn btn-outline-secondary`}
                 onClick={() => {
                   modifyWorktime(editAttendanceTime);
                 }}
@@ -84,7 +83,7 @@ const ModalComponent = React.memo(
               </button>
             ) : (
               <button
-                className={styles.modal_close_btn}
+                className={`${styles.modal_close_btn} btn btn-outline-secondary`}
                 onClick={() => {
                   modifyWorktime(
                     editDate,
@@ -98,7 +97,7 @@ const ModalComponent = React.memo(
             )}
 
             <button
-              className={styles.modal_close_btn}
+              className={`${styles.modal_close_btn} btn btn-outline-secondary`}
               onClick={() => onClose()}
             >
               닫기
