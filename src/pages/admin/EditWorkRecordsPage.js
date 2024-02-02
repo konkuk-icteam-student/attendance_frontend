@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
 import { formatTime, formatTimeForServer } from "../../util/stringUtils";
+import styles from "../../css/EditWorkRecordsPage.module.css";
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
   //모달 오픈 여부
@@ -219,11 +220,7 @@ function EditWorkRecords() {
         )}&month=${now.get("month") + 1}`
       )
       .then((res) => {
-        if (res.data.totalDuration == "PT0S") {
-          setTotalWorkTime("0시간 0분");
-        } else {
-          setTotalWorkTime(formatTime(res.data.totalDuration));
-        }
+        setTotalWorkTime(formatTime(res.data.totalDuration));
 
         var groupedItem = {};
         if (res.data.length == 0) {

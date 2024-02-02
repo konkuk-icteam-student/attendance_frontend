@@ -2965,8 +2965,9 @@ fieldset:disabled .btn {
   color: var(--bs-btn-disabled-color);
   pointer-events: none;
   background-color: var(--bs-btn-disabled-bg);
-  border-color: var(--bs-btn-disabled-border-color);
-  opacity: var(--bs-btn-disabled-opacity);
+  border-color: rgb(181, 181, 181);
+  /* opacity: var(--bs-btn-disabled-opacity); */
+  opacity: 1;
 }
 
 .btn-primary {

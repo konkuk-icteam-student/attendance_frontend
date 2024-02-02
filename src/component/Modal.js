@@ -22,7 +22,6 @@ const ModalComponent = React.memo(
       px: 4,
       pb: 3,
       borderRadius: "15px",
-      zIndex: 9999, // z-index 값 설정
     };
     const handleNewAttendanceData = (data) => {
       setEditAttendanceTime(data);
