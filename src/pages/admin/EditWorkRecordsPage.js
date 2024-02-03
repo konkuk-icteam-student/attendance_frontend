@@ -7,6 +7,11 @@ import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
 import { formatTime, formatTimeForServer } from "../../util/stringUtils";
 import styles from "../../css/EditWorkRecordsPage.module.css";
+import { DatePicker } from "@mui/x-date-pickers";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { CropLandscapeOutlined } from "@mui/icons-material";
+// 학생 선택하고 날짜 선택해도 리디렉션 되게 설정하기
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
   //모달 오픈 여부
@@ -27,6 +32,8 @@ function EditWorkRecords() {
 
   //현재 날짜
   let now = dayjs();
+  // 출근 기록을 확인할 날짜 (DatePicker에서 선택한 날짜)
+  const [attendanceDateToCheck, setAttendanceDateToCheck] = useState(null);
   //총 근로시간
   const [TotalWorkTime, setTotalWorkTime] = useState(null);
 
@@ -35,10 +42,13 @@ function EditWorkRecords() {
 
   const TableColumns = [
     {
-      accessor: "arriveAttendance.attendanceDate",
-
+      accessor: (row) =>
+        row.arriveAttendance.attendanceDate
+          ? row.arriveAttendance.attendanceDate
+          : row.leaveAttendance.attendanceDate,
       Header: "날짜",
     },
+
     {
       accessor: "arriveAttendance.attendanceTime",
       Header: "출근",
@@ -98,7 +108,10 @@ function EditWorkRecords() {
         .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
         .then((res) => {
           alert("수정되었습니다.");
-          handleSelectStudent({ target: { value: selectedStudentId } });
+          handleSelectStudent(
+            { target: { value: selectedStudentId } },
+            attendanceDateToCheck
+          );
         })
         .catch((err) => {
           console.log("err", err);
@@ -122,7 +135,10 @@ function EditWorkRecords() {
         .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
         .then((res) => {
           alert("수정되었습니다.");
-          handleSelectStudent({ target: { value: selectedStudentId } });
+          handleSelectStudent(
+            { target: { value: selectedStudentId } },
+            attendanceDateToCheck
+          );
         })
         .catch((err) => {
           console.log("err", err);
@@ -158,7 +174,10 @@ function EditWorkRecords() {
       .post(`/user/admin-attendance`, body)
       .then((res) => {
         alert("추가되었습니다.");
-        handleSelectStudent({ target: { value: selectedStudentId } });
+        handleSelectStudent(
+          { target: { value: selectedStudentId } },
+          attendanceDateToCheck
+        );
       })
       .catch((err) => {
         console.log("err", err);
@@ -205,92 +224,114 @@ function EditWorkRecords() {
         .then(alert("퇴근 기록 삭제되었습니다."));
     }
 
-    handleSelectStudent({ target: { value: selectedStudentId } });
+    handleSelectStudent(
+      { target: { value: selectedStudentId } },
+      attendanceDateToCheck
+    );
   };
 
   //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
-  const handleSelectStudent = async (event) => {
+  const handleSelectStudent = async (event, dateData) => {
     setSelectedStudentId(event.target.value);
 
-    //추후 개발 건의: default year, month는 dayjs써서 현시점으로 세팅했음, 추후에 사용자가 조작할 수 있는 UI추가하면 좋을듯)
-    await client
-      .get(
-        `/user/attendance/monthly/${event.target.value}?year=${now.get(
-          "y"
-        )}&month=${now.get("month") + 1}`
-      )
-      .then((res) => {
-        setTotalWorkTime(formatTime(res.data.totalDuration));
+    if (dateData) {
+      console.log("date choose", dateData.$M, dateData.$y);
+      await client
+        .get(
+          `/user/attendance/monthly/${event.target.value}?year=${
+            dateData.$y
+          }&month=${dateData.$M + 1}`
+        )
+        .then((res) => {
+          setTotalWorkTime(formatTime(res.data.totalDuration));
 
-        var groupedItem = {};
-        if (res.data.length == 0) {
-          alert("해당 학생의 근로 데이터가 없습니다.");
-        } else {
-          res.data.attendanceDataList.forEach((item, index) => {
-            if (item.arriveAttendance == null) {
-              groupedItem = {
-                ...item,
-                arriveAttendance: {
-                  ...item.arriveAttendance,
-                  attendanceTime: undefined,
-                },
-                leaveAttendance: {
-                  ...item.leaveAttendance,
-                  attendanceTime: dayjs(
-                    item.leaveAttendance.attendanceTime
-                  ).format("HH:mm"),
-                },
-                workDuration: null,
-              };
-            } else if (item.leaveAttendance == null) {
-              groupedItem = {
-                ...item,
-                arriveAttendance: {
-                  ...item.arriveAttendance,
-                  attendanceTime: dayjs(
-                    item.arriveAttendance.attendanceTime
-                  ).format("HH:mm"),
-                },
-                leaveAttendance: {
-                  ...item.leaveAttendance,
-                  attendanceTime: undefined,
-                },
-                workDuration: null,
-              };
-            } else {
-              groupedItem = {
-                ...item,
-                arriveAttendance: {
-                  ...item.arriveAttendance,
-                  attendanceTime: dayjs(
-                    item.arriveAttendance.attendanceTime
-                  ).format("HH:mm"),
-                },
-                leaveAttendance: {
-                  ...item.leaveAttendance,
-                  attendanceTime: dayjs(
-                    item.leaveAttendance.attendanceTime
-                  ).format("HH:mm"),
-                },
-                workDuration: formatTime(item.workDuration),
-              };
-            }
+          var groupedItem = {};
+          if (res.data.length == 0) {
+            alert("해당 학생의 근로 데이터가 없습니다.");
+          } else {
+            /** 서버로부터 받는 학생 근로 기록은 형태는 총 3가지. 각 케이스별로 처리 
+                1. 출근 기록이 없는 경우
+                2. 퇴근 기록이 없는 경우
+                3. 둘 다 정상 값이 들어오는 경우 **/
+            res.data.attendanceDataList.forEach((item, index) => {
+              if (item.arriveAttendance == null) {
+                groupedItem = {
+                  ...item,
+                  arriveAttendance: {
+                    ...item.arriveAttendance,
+                    attendanceTime: undefined,
+                  },
+                  leaveAttendance: {
+                    ...item.leaveAttendance,
+                    attendanceTime: dayjs(
+                      item.leaveAttendance.attendanceTime
+                    ).format("HH:mm"),
+                  },
+                  workDuration: null,
+                };
+              } else if (item.leaveAttendance == null) {
+                groupedItem = {
+                  ...item,
+                  arriveAttendance: {
+                    ...item.arriveAttendance,
+                    attendanceTime: dayjs(
+                      item.arriveAttendance.attendanceTime
+                    ).format("HH:mm"),
+                  },
+                  leaveAttendance: {
+                    ...item.leaveAttendance,
+                    attendanceTime: undefined,
+                  },
+                  workDuration: null,
+                };
+              } else {
+                groupedItem = {
+                  ...item,
+                  arriveAttendance: {
+                    ...item.arriveAttendance,
+                    attendanceTime: dayjs(
+                      item.arriveAttendance.attendanceTime
+                    ).format("HH:mm"),
+                  },
+                  leaveAttendance: {
+                    ...item.leaveAttendance,
+                    attendanceTime: dayjs(
+                      item.leaveAttendance.attendanceTime
+                    ).format("HH:mm"),
+                  },
+                  workDuration: formatTime(item.workDuration),
+                };
+              }
 
-            groupedData.push(groupedItem);
-          });
-        }
+              groupedData.push(groupedItem);
+            });
+          }
 
-        setWorkTimeData(groupedData);
-      });
+          setWorkTimeData(groupedData);
+        });
+    }
   };
+  const handleAttendanceDateToCheck = async (newValue) => {
+    console.log("Selected Date:", newValue);
 
+    setAttendanceDateToCheck(newValue);
+    if (selectedStudentId) {
+      console.log("selectedStudentId", selectedStudentId);
+      await handleSelectStudent(
+        { target: { value: selectedStudentId } },
+        newValue
+      );
+    } else {
+      console.log("test?");
+    }
+  };
   useEffect(() => {
-    const fetchStudentAndData = async () => {
-      await fetchStudentList();
-      // setIsDataLoaded(true);
-    };
-
-    fetchStudentAndData();
+    // const fetchStudentAndData = async () => {
+    //   await fetchStudentList();
+    //   // setIsDataLoaded(true);
+    // };
+    fetchStudentList();
+    // fetchStudentAndData();
   }, []);
 
   return (
@@ -320,9 +361,26 @@ function EditWorkRecords() {
           />
         )}
       </div>
+
       <div className="container text-center">
         <div className="row">
-          <div className="col">
+          <div className="col-sm-3">
+            {" "}
+            <LocalizationProvider
+              dateAdapter={AdapterDayjs}
+              dateFormats={{ monthShort: `M` }}
+            >
+              {/* <DemoContainer components={["DatePicker", "DatePicker"]}> */}
+              <DatePicker
+                format="YYYY-MM"
+                views={["year", "month"]}
+                value={attendanceDateToCheck}
+                onChange={handleAttendanceDateToCheck}
+              />
+              {/* </DemoContainer> */}
+            </LocalizationProvider>
+          </div>
+          <div className="col-sm-7">
             <select
               className="form-select"
               aria-label="Default select example"
@@ -331,7 +389,6 @@ function EditWorkRecords() {
               <option value="" disabled selected>
                 학생 선택
               </option>
-
               {
                 //학생 목록 띄우기
                 studentList.map((student) => {
@@ -400,7 +457,7 @@ function EditWorkRecords() {
             </div>
           ) : (
             <div className="row justify-content-center mt-3">
-              학생을 선택해주세요.
+              학생과 조회할 근로 년/월을 선택해주세요.
             </div>
           )
         }

@@ -11,12 +11,7 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import Button from "@mui/material/Button";
 
-function TimeAdditionPickers({
-  defaultdata,
-  dateChange,
-  timeChange,
-  attendanceStatus,
-}) {
+function TimeAdditionPickers({ dateChange, timeChange, attendanceStatus }) {
   const [selectedStatus, setSelectedStatus] = useState(null);
   const handleEditTime = (data) => {
     timeChange(data);
@@ -31,35 +26,19 @@ function TimeAdditionPickers({
     attendanceStatus(data);
   };
   useEffect(() => {
-    if (defaultdata && defaultdata.status == "출근") {
-      setSelectedStatus("출근");
-    } else if (defaultdata && defaultdata.status == "퇴근") {
-      setSelectedStatus("퇴근");
-    }
     // console.log("status check", defaultdata);
-  }, [defaultdata]);
+  }, []);
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          defaultValue={
-            defaultdata.attendanceDate
-              ? dayjs(defaultdata.attendanceDate)
-              : undefined
-          }
+          showDaysOutsideCurrentMonth
           onChange={(data) => handleEditDate(data)}
         />
         <DemoContainer components={["TimePicker"]}>
           <TimePicker
             label="Basic time picker"
-            defaultValue={
-              defaultdata.attendanceTime
-                ? dayjs(defaultdata.attendanceTime)
-                : undefined
-            }
             onChange={(data) => {
-              // dateChange(data);
-              console.log("timedata", data);
               handleEditTime(data);
             }}
           />

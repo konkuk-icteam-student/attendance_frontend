@@ -63,7 +63,7 @@ const ModalComponent = React.memo(
             />
           ) : (
             <TimeAdditionPickers
-              defaultdata={rowData}
+              // defaultdata={rowData}
               dateChange={handleEditDate}
               timeChange={handleEditTime}
               attendanceStatus={handleAttendanceStatus}
