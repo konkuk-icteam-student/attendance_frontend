@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import React, { useCallback, useRef, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/styles.css";
 import Nav from "../src/component/Nav";
@@ -13,7 +13,11 @@ function Home() {
   const [workingMembers, setWorkingMembers] = useState([]);
   const [deptList, setDeptList] = useState([]);
   // const workingMembers = ["김호준", "김나경", "박준형", "지민영"];
+  const [socketData, setSocketData] = useState();
   const [dept, setDept] = useState("정보운영팀");
+  const [checkSocketLogin, setCheckSocketLogin] = useState(false);
+  const ws = useRef(null); //webSocket을 담는 변수,
+
   const handleDeptChange = (event) => {
     setDept(event.target.value);
     client.get(`/user/attendance/current/${event.target.value}`).then((res) => {
@@ -22,12 +26,24 @@ function Home() {
     });
   };
 
+  const webSocketLogin = useCallback(() => {
+    ws.current = new WebSocket("ws://localhost:8080/socket/workingMembers");
+
+    ws.current.onmessage = (message) => {
+      const dataSet = JSON.parse(message.data);
+      setSocketData(dataSet);
+    };
+  });
   useEffect(() => {
+    webSocketLogin();
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
-      console.log(res.data);
     });
-  }, [dept]);
+    if (socketData !== undefined) {
+      console.log("socketData", socketData);
+      setWorkingMembers(socketData);
+    }
+  }, [socketData, dept]);
   return (
     <div>
       <Nav />
