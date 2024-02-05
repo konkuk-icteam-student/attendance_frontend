@@ -115,6 +115,7 @@ function EditWorkRecords() {
         })
         .catch((err) => {
           console.log("err", err);
+          console.log(arriveBody);
           alert(
             "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
           );
@@ -234,13 +235,17 @@ function EditWorkRecords() {
   const handleSelectStudent = async (event, dateData) => {
     setSelectedStudentId(event.target.value);
 
-    if (dateData) {
-      console.log("date choose", dateData.$M, dateData.$y);
+    if (attendanceDateToCheck) {
+      console.log(
+        "date choose",
+        attendanceDateToCheck.$M,
+        attendanceDateToCheck.$y
+      );
       await client
         .get(
           `/user/attendance/monthly/${event.target.value}?year=${
-            dateData.$y
-          }&month=${dateData.$M + 1}`
+            attendanceDateToCheck.$y
+          }&month=${attendanceDateToCheck.$M + 1}`
         )
         .then((res) => {
           setTotalWorkTime(formatTime(res.data.totalDuration));
@@ -309,6 +314,9 @@ function EditWorkRecords() {
 
           setWorkTimeData(groupedData);
         });
+    } else {
+      console.log("date not choose");
+      alert("날짜가 선택되지 않았습니다. 날짜를 선택해주세요.");
     }
   };
   const handleAttendanceDateToCheck = async (newValue) => {
