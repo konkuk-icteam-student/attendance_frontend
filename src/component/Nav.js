@@ -34,7 +34,7 @@ function MyNav() {
                 <Nav className="justify-content-end flex-grow-1 pe-3">
                   <Nav.Link onClick={goLogin}>Login</Nav.Link>
                   <Nav.Link href="/manage">Manage</Nav.Link>
-                  <NavDropdown
+                  {/* <NavDropdown
                     title="기타"
                     id={`offcanvasNavbarDropdown-expand-${expand}`}
                   >
@@ -46,17 +46,8 @@ function MyNav() {
                     <NavDropdown.Item href="#action5">
                       Something else here
                     </NavDropdown.Item>
-                  </NavDropdown>
+                  </NavDropdown> */}
                 </Nav>
-                <Form className="d-flex">
-                  <Form.Control
-                    type="search"
-                    placeholder="Search"
-                    className="me-2"
-                    aria-label="Search"
-                  />
-                  <Button variant="outline-success">Search</Button>
-                </Form>
               </Offcanvas.Body>
             </Navbar.Offcanvas>
           </Container>
