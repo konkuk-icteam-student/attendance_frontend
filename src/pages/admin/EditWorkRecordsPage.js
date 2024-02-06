@@ -1,16 +1,19 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import Nav from "../../component/Nav";
-import Table from "../../component/Table";
-import ModalComponent from "../../component/Modal";
+
 import dayjs from "dayjs";
 import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
+
 import { formatTime, formatTimeForServer } from "../../util/stringUtils";
-import styles from "../../css/EditWorkRecordsPage.module.css";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { CropLandscapeOutlined } from "@mui/icons-material";
+
+//사용 Component
+import Nav from "../../component/Nav";
+import Table from "../../component/Table";
+import ModalComponent from "../../component/Modal";
+
 // 학생 선택하고 날짜 선택해도 리디렉션 되게 설정하기
 // 학생 근로시간을 수정할 수 있는 페이지
 function EditWorkRecords() {
@@ -105,7 +108,7 @@ function EditWorkRecords() {
       };
       //출근 시간 수정 api 호출
       await client
-        .put(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
+        .patch(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
         .then((res) => {
           alert("수정되었습니다.");
           handleSelectStudent(
@@ -133,7 +136,7 @@ function EditWorkRecords() {
       };
       //퇴근 시간 수정 api 호출
       await client
-        .put(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
+        .patch(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
         .then((res) => {
           alert("수정되었습니다.");
           handleSelectStudent(
