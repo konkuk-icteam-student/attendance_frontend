@@ -1,10 +1,16 @@
 import React, { useCallback, useRef, useEffect, useState } from "react";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/styles.css";
 import Nav from "../src/component/Nav";
 import Board from "../src/component/Board";
 import client from "./util/clients";
+import WebSocketManager from "./util/WebSocketManager";
 
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
+
+//부서 선택될 때 마다 부서 아이디 가져와서 웹소켓 url 연결하기
 function Home() {
   const [commuteInfo, setCommuteInfo] = useState("출퇴근 버튼을 눌러주세요");
   const handleCommuteBtn = () => {
@@ -26,29 +32,24 @@ function Home() {
     });
   };
 
-  const webSocketLogin = useCallback(() => {
-    ws.current = new WebSocket("ws://localhost:8080/socket/workingMembers");
-
-    ws.current.onmessage = (message) => {
-      const dataSet = JSON.parse(message.data);
-      setSocketData(dataSet);
-    };
-  });
   useEffect(() => {
-    webSocketLogin();
-    client.get("/dept/list").then((res) => {
-      setDeptList(res.data);
+    const disconnectWebSocket = WebSocketManager((stompClient) => {
+      stompClient.subscribe("/topic/attendance/dept/1", (message) => {
+        const currentAttendanceUsers = JSON.parse(message.body);
+        // 현재 출석 유저 정보를 처리하는 로직을 추가하세요
+        console.log("Received:", currentAttendanceUsers);
+      });
     });
-    if (socketData !== undefined) {
-      console.log("socketData", socketData);
-      setWorkingMembers(socketData);
-    }
-  }, [socketData, dept]);
+
+    // 컴포넌트 언마운트 시 WebSocket 연결 해제
+    return () => disconnectWebSocket();
+  }, []);
   return (
     <div>
       <Nav />
       <div className="container px-4 px-lg-5">
         {/* Heading Row */}
+
         <div className="col">
           {" "}
           <select
@@ -56,9 +57,10 @@ function Home() {
             className="form-select"
             aria-label="Default select example"
           >
-            <option defaultValue="none">부서선택</option>
+            <option disabled selected value="">
+              부서선택
+            </option>
             {deptList.map((dept) => {
-              // console.log("부서리스트?", dept.deptName);
               return (
                 <option key={dept.id} value={dept.id}>
                   {dept.deptName}
