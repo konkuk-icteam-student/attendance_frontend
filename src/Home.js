@@ -5,10 +5,8 @@ import "./css/styles.css";
 import Nav from "../src/component/Nav";
 import Board from "../src/component/Board";
 import client from "./util/clients";
-import WebSocketManager from "./util/WebSocketManager";
-
-import SockJS from "sockjs-client";
 import Stomp from "stompjs";
+import SockJS from "sockjs-client";
 
 //부서 선택될 때 마다 부서 아이디 가져와서 웹소켓 url 연결하기
 function Home() {
@@ -23,7 +21,9 @@ function Home() {
   const [dept, setDept] = useState("정보운영팀");
   const [checkSocketLogin, setCheckSocketLogin] = useState(false);
   const ws = useRef(null); //webSocket을 담는 변수,
+  const [stompClient, setStompClient] = useState(null);
 
+  const [webSocket, setWebSocket] = useState(null);
   const handleDeptChange = (event) => {
     setDept(event.target.value);
     client.get(`/user/attendance/current/${event.target.value}`).then((res) => {
@@ -33,16 +33,19 @@ function Home() {
   };
 
   useEffect(() => {
-    const disconnectWebSocket = WebSocketManager((stompClient) => {
-      stompClient.subscribe("/topic/attendance/dept/1", (message) => {
-        const currentAttendanceUsers = JSON.parse(message.body);
-        // 현재 출석 유저 정보를 처리하는 로직을 추가하세요
-        console.log("Received:", currentAttendanceUsers);
-      });
+    const socket = new SockJS("http://localhost:8080/ws"); // 스프링 부트 서버 주소에 맞게 변경
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+      console.log("WebSocket Connected");
+      setStompClient(stomp);
     });
 
-    // 컴포넌트 언마운트 시 WebSocket 연결 해제
-    return () => disconnectWebSocket();
+    return () => {
+      if (stompClient) {
+        stompClient.disconnect();
+      }
+    };
   }, []);
   return (
     <div>
