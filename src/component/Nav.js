@@ -7,18 +7,30 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import Login from "../pages/common/LoginPage";
 import { useNavigate } from "react-router-dom";
-function MyNav() {
+import { useParams } from "react-router-dom";
+import React, { useCallback, useRef, useEffect, useState } from "react";
+
+function MyNav({ deptName }) {
   const navigate = useNavigate();
   const goLogin = (e) => {
     e.preventDefault();
     navigate("/login");
   };
+  const StoredDeptName = window.localStorage.getItem("deptName");
+  useEffect(() => {
+    // deptName이 변경될 때마다 로그 찍기 (실제로는 여기서 다른 업데이트 로직을 추가하면 됩니다)
+    console.log("DeptName Updated:", deptName);
+  }, [deptName]);
   return (
     <>
       {["sm"].map((expand) => (
         <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3">
           <Container fluid>
-            <Navbar.Brand href="/">건국대 정보운영팀</Navbar.Brand>
+            {StoredDeptName ? (
+              <Navbar.Brand href="/">건국대 {StoredDeptName}</Navbar.Brand>
+            ) : (
+              <Navbar.Brand href="/">건국대 {deptName}</Navbar.Brand>
+            )}
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
               id={`offcanvasNavbar-expand-${expand}`}
