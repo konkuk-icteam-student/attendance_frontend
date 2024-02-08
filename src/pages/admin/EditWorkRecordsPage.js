@@ -10,7 +10,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 //사용 Component
-import Nav from "../../component/Nav";
 import Table from "../../component/Table";
 import ModalComponent from "../../component/Modal";
 
@@ -193,7 +192,8 @@ function EditWorkRecords() {
   };
   //부서에 속한 학생 목록 가져오기 (현재는 1번 부서)
   const fetchStudentList = () => {
-    client.get("/dept/1").then((res) => {
+    const deptID = window.localStorage.getItem("deptID");
+    client.get(`/dept/${deptID}`).then((res) => {
       if (res.data.users.length == 0) {
         alert("해당 부서에 속한 학생이 없습니다.");
       } else {
@@ -347,7 +347,6 @@ function EditWorkRecords() {
 
   return (
     <>
-      <Nav />
       <div>
         {/* 학생 근로 시간 수정하는 모달 */}
         {editModalOpen && (
