@@ -2,11 +2,11 @@ import React, { useCallback, useRef, useEffect, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./css/styles.css";
-import Nav from "../src/component/Nav";
 import Board from "../src/component/Board";
 import client from "./util/clients";
 import Stomp from "stompjs";
 import SockJS from "sockjs-client";
+import Nav from "./component/Nav";
 
 //부서 선택될 때 마다 부서 아이디 가져와서 웹소켓 url 연결하기
 function Home() {
@@ -17,32 +17,52 @@ function Home() {
   const [workingMembers, setWorkingMembers] = useState([]);
   const [deptList, setDeptList] = useState([]);
   const [socketData, setSocketData] = useState();
-  const [deptID, setDeptID] = useState(1);
+  const [deptID, setDeptID] = useState(() => {
+    const storedDeptID = localStorage.getItem("deptID");
+
+    // 만약 값이 존재한다면 해당 값을 반환, 없으면 0을 반환
+    return storedDeptID ? parseInt(storedDeptID) : 0;
+  });
+  const [deptName, setDeptName] = useState(() => {
+    const storedDeptName = localStorage.getItem("deptName");
+    return storedDeptName ? storedDeptName : "";
+  });
   const [checkSocketLogin, setCheckSocketLogin] = useState(false);
   const ws = useRef(null); //webSocket을 담는 변수,
   const [stompClient, setStompClient] = useState(null);
 
   const [webSocket, setWebSocket] = useState(null);
+  let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
+  let stomp = Stomp.over(sockJS);
+
   const handleDeptChange = (event) => {
     setDeptID(event.target.value);
+    setDeptName(event.target.options[event.target.selectedIndex].text);
     setWorkingMembers([]);
+    stompClient.disconnect();
   };
 
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
+
+      console.log(res.data);
     });
   };
-  let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
-  let stomp = Stomp.over(sockJS);
 
   useEffect(() => {
     fetchDeptList();
+    if (deptID === undefined) {
+    } else {
+      window.localStorage.setItem("deptID", deptID);
+      window.localStorage.setItem("deptName", deptName);
+    }
+
     stomp.connect({}, () => {
       console.log("WebSocket Connected");
       setStompClient(stomp);
 
-      stomp.subscribe(`/topic/currentMember/1`, (message) => {
+      stomp.subscribe(`/topic/currentMember/${deptID}`, (message) => {
         //받은 데이터를 현재 출근중인 멤버리스트에 저장
         const receivedData = JSON.parse(message.body);
         setWorkingMembers(receivedData);
@@ -60,7 +80,7 @@ function Home() {
   }, [deptID]);
   return (
     <div>
-      <Nav />
+      <Nav deptName={deptName} />
       <div className="container px-4 px-lg-5">
         {/* Heading Row */}
         <div className="col">
@@ -70,9 +90,16 @@ function Home() {
             className="form-select"
             aria-label="Default select example"
           >
+            <option disabled selected value="">
+              부서선택
+            </option>
             {deptList.map((dept) => {
               return (
-                <option key={dept.id} value={dept.id}>
+                <option
+                  key={dept.id}
+                  value={dept.id}
+                  selected={deptID === dept.id}
+                >
                   {dept.deptName}
                 </option>
               );
