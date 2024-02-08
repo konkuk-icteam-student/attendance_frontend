@@ -21,7 +21,7 @@ function Board() {
       <div className="row justify-content-center">
         {workingMembers.map((member) => {
           return (
-            <div>
+            <div key={member.id}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
                   <AccountCircleIcon fontSize="large" />
