@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import InputGroup from "react-bootstrap/InputGroup";
-import Nav from "../../component/Nav";
 import { useNavigate } from "react-router-dom";
 import client from "../../util/clients";
 import InputLabel from "@mui/material/InputLabel";
@@ -61,7 +60,6 @@ function Signup() {
   }, [studentDepartment]);
   return (
     <>
-      <Nav />
       <div className="position-relative text-center">
         {" "}
         <h2 className="mb-3">회원가입</h2>

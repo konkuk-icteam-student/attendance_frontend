@@ -1,13 +1,11 @@
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import Nav from "../../component/Nav";
 import { useNavigate } from "react-router-dom";
 function Login() {
   let navigate = useNavigate();
 
   return (
     <>
-      <Nav />
       <div className="position-relative text-center">
         {" "}
         <h2 className="mb-3">로그인</h2>
