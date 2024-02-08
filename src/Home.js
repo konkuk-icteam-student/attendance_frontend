@@ -31,8 +31,14 @@ function Home() {
       console.log("??", res.data, event.target.value);
     });
   };
+  const fetchDeptList = async () => {
+    client.get("/dept/list").then((res) => {
+      setDeptList(res.data);
+    });
+  };
 
   useEffect(() => {
+    fetchDeptList();
     const socket = new SockJS("http://localhost:8080/ws"); // 스프링 부트 서버 주소에 맞게 변경
     const stomp = Stomp.over(socket);
 
