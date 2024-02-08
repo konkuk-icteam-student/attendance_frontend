@@ -26,11 +26,17 @@ function Home() {
   const [webSocket, setWebSocket] = useState(null);
   const handleDeptChange = (event) => {
     setDept(event.target.value);
-    client.get(`/user/attendance/current/${event.target.value}`).then((res) => {
-      setWorkingMembers(res.data);
-      console.log("??", res.data, event.target.value);
-    });
+    stompClient.subscribe(
+      `/topic/currentMember/${event.target.value}`,
+      (message) => {
+        const receivedData = JSON.parse(message.body);
+        console.log("Received Data:", receivedData);
+        // 받은 데이터를 상태나 다른 곳에 적용하세요.
+        setWorkingMembers(receivedData);
+      }
+    );
   };
+
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
@@ -39,7 +45,7 @@ function Home() {
 
   useEffect(() => {
     fetchDeptList();
-    const socket = new SockJS("http://localhost:8080/ws"); // 스프링 부트 서버 주소에 맞게 변경
+    const socket = new SockJS("/ws"); // 스프링 부트 서버 주소에 맞게 변경
     const stomp = Stomp.over(socket);
 
     stomp.connect({}, () => {
