@@ -18,15 +18,57 @@ import Signup from "./pages/common/SignupPage";
 import EditWorkRecords from "./pages/admin/EditWorkRecordsPage";
 import DepartmentManagementPage from "./pages/admin/DepartmentManagementPage";
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
   <BrowserRouter>
+    {/* <Nav /> */}
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/manage" element={<Manage />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/workinginfo" element={<EditWorkRecords />} />
-      <Route path="/department-manage" element={<DepartmentManagementPage />} />
+      <Route
+        path="/login"
+        element={
+          <div>
+            <Nav></Nav>
+            <Login />
+          </div>
+        }
+      />
+      <Route
+        path="/manage"
+        element={
+          <div>
+            <Nav> </Nav>
+            <Manage />
+          </div>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <div>
+            <Nav> </Nav>
+            <Signup />
+          </div>
+        }
+      />
+      <Route
+        path="/workinginfo"
+        element={
+          <div>
+            <Nav> </Nav>
+            <EditWorkRecords />
+          </div>
+        }
+      />
+      <Route
+        path="/department-manage"
+        element={
+          <div>
+            <Nav> </Nav>
+            <DepartmentManagementPage />
+          </div>
+        }
+      />
     </Routes>
   </BrowserRouter>
 );
