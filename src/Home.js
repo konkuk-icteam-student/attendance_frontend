@@ -16,7 +16,6 @@ function Home() {
   };
   const [workingMembers, setWorkingMembers] = useState([]);
   const [deptList, setDeptList] = useState([]);
-  // const workingMembers = ["김호준", "김나경", "박준형", "지민영"];
   const [socketData, setSocketData] = useState();
   const [deptID, setDeptID] = useState(1);
   const [checkSocketLogin, setCheckSocketLogin] = useState(false);
@@ -26,6 +25,7 @@ function Home() {
   const [webSocket, setWebSocket] = useState(null);
   const handleDeptChange = (event) => {
     setDeptID(event.target.value);
+    setWorkingMembers([]);
   };
 
   const fetchDeptList = async () => {
@@ -35,28 +35,28 @@ function Home() {
   };
   let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
   let stomp = Stomp.over(sockJS);
-  stomp.connect({}, () => {
-    console.log("WebSocket Connected");
-    setStompClient(stomp);
 
-    stomp.subscribe(`/topic/currentMember/1`, (message) => {
-      console.log("여기 들어왔는지?");
-      console.log("Received Data:", message.body);
-      //받은 데이터를 현재 출근중인 멤버리스트에 저장
-      const receivedData = JSON.parse(message.body);
-      setWorkingMembers(receivedData);
-    });
-
-    stomp.send(`/app/dept`, {}, JSON.stringify({ deptId: 1 }));
-  });
   useEffect(() => {
     fetchDeptList();
+    stomp.connect({}, () => {
+      console.log("WebSocket Connected");
+      setStompClient(stomp);
 
-    // return () => {
-    //   if (stompClient) {
-    //     stompClient.disconnect();
-    //   }
-    // };
+      stomp.subscribe(`/topic/currentMember/1`, (message) => {
+        //받은 데이터를 현재 출근중인 멤버리스트에 저장
+        const receivedData = JSON.parse(message.body);
+        setWorkingMembers(receivedData);
+      });
+
+      stomp.send(`/app/dept/${deptID}`, {}, null);
+    });
+    //useEffect에서 return을 하면 컴포넌트가 언마운트 될 때 또는 useEffect 실행전에 먼저 실행됨
+    return () => {
+      //stompClient 객체가 존재하면 웹소켓 연결 끊음
+      if (stompClient) {
+        stompClient.disconnect();
+      }
+    };
   }, [deptID]);
   return (
     <div>
@@ -77,34 +77,28 @@ function Home() {
                 </option>
               );
             })}
-            {/* <option defaultValue="정보운영팀">정보운영팀</option>
-            <option value="2">입학처</option>
-            <option value="3">공과대학행정</option> */}
           </select>
         </div>
         <div className="row gx-4 gx-lg-5 align-items-center my-5">
-          {/* <div className="col-lg-6">{commuteInfo}</div> */}
           <div className="col-lg-8">
             <h1 className="font-weight-light">2023-2&nbsp;정보운영팀 출근부</h1>
             <p>관리용 홈페이지..</p>
-            {/* <a className="btn btn-primary" onClick={handleCommuteBtn} href="#!">
-              출/퇴근하기
-            </a> */}
           </div>
         </div>
-        {/* Call to Action */}
         <div className="card  my-5 py-4 text-center">
           <div className="card-body">
             <h4 className=" m-0">현재 출근중인 멤버</h4>
             <br />
             <div className="row justify-content-center">
               {workingMembers.map((member) => {
-                return <h5 className="m-0">{member.userName}</h5>;
+                return (
+                  <h5 className="m-0" key={member.id}>
+                    {member.userName}
+                  </h5>
+                );
               })}
             </div>
           </div>
-
-          {/* Content Row */}
         </div>
         <h4 className=" m-0">전체 근로생</h4>
         <Board />
