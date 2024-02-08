@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import InputGroup from "react-bootstrap/InputGroup";
-import Nav from "../../component/Nav";
 import client from "../../util/clients";
 //부서 추가, 수정 페이지
 function DepartmentManagementPage() {
@@ -10,6 +9,7 @@ function DepartmentManagementPage() {
   const [deptOID, setDeptOID] = useState();
   const [deptList, setDeptList] = useState([]);
 
+  const StoredDeptID = window.localStorage.getItem("deptID");
   const handleDeptChange = (event) => {
     setDeptOID(event.target.value);
   };
@@ -32,7 +32,9 @@ function DepartmentManagementPage() {
       alert("부서 삭제 완료");
       fetchDeptList();
     });
-    console.log(response);
+
+    window.localStorage.removeItem("deptID");
+    window.localStorage.removeItem("deptName");
   };
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
@@ -47,7 +49,6 @@ function DepartmentManagementPage() {
 
   return (
     <div>
-      <Nav />
       <div>
         <h2>부서 추가 page</h2>
       </div>
@@ -81,9 +82,14 @@ function DepartmentManagementPage() {
           <option disabled selected value="">
             부서선택
           </option>
+
           {deptList.map((dept) => {
             return (
-              <option key={dept.id} value={dept.id}>
+              <option
+                key={dept.id}
+                value={dept.id}
+                disabled={StoredDeptID != dept.id}
+              >
                 {dept.deptName}
               </option>
             );
