@@ -1,10 +1,13 @@
-import React from "react";
-import Nav from "../../component/Nav";
+import React, { useEffect, useState } from "react";
 function App() {
+  const [deptID, setDeptID] = useState(0);
+  useEffect(() => {
+    // 로컬스토리지에서 deptID 값을 가져오거나 기본값을 설정
+    const storedDeptID = parseInt(localStorage.getItem("deptID"), 10) || 0;
+    setDeptID(storedDeptID);
+  }, []);
   return (
     <div>
-      <Nav />
-
       {/* Page Content */}
       <div className="container px-4 px-lg-5">
         {/* Content Row */}
@@ -18,7 +21,12 @@ function App() {
                 </p>
               </div>
               <div className="card-footer">
-                <a className="btn btn-primary btn-sm" href="workinginfo">
+                <a
+                  className={`btn btn-primary btn-sm ${
+                    deptID === 0 ? "disabled" : ""
+                  }`}
+                  href="workinginfo"
+                >
                   More Info
                 </a>
               </div>
@@ -33,7 +41,12 @@ function App() {
                 </p>
               </div>
               <div className="card-footer">
-                <a className="btn btn-primary btn-sm" href="#!">
+                <a
+                  className={`btn btn-primary btn-sm ${
+                    deptID === 0 ? "disabled" : ""
+                  }`}
+                  href="#!"
+                >
                   More Info
                 </a>
               </div>
