@@ -18,23 +18,23 @@ function Home() {
   const [deptList, setDeptList] = useState([]);
   // const workingMembers = ["김호준", "김나경", "박준형", "지민영"];
   const [socketData, setSocketData] = useState();
-  const [dept, setDept] = useState("정보운영팀");
+  const [deptID, setDeptID] = useState(1);
   const [checkSocketLogin, setCheckSocketLogin] = useState(false);
   const ws = useRef(null); //webSocket을 담는 변수,
   const [stompClient, setStompClient] = useState(null);
 
   const [webSocket, setWebSocket] = useState(null);
   const handleDeptChange = (event) => {
-    setDept(event.target.value);
-    stompClient.subscribe(
-      `/topic/currentMember/${event.target.value}`,
-      (message) => {
-        const receivedData = JSON.parse(message.body);
-        console.log("Received Data:", receivedData);
-        // 받은 데이터를 상태나 다른 곳에 적용하세요.
-        setWorkingMembers(receivedData);
-      }
-    );
+    setDeptID(event.target.value);
+    // stompClient.subscribe(
+    //   `/topic/currentMember/${event.target.value}`,
+    //   (message) => {
+    //     const receivedData = JSON.parse(message.body);
+    //     console.log("Received Data:", receivedData);
+    //     // 받은 데이터를 상태나 다른 곳에 적용하세요.
+    //     setWorkingMembers(receivedData);
+    //   }
+    // );
   };
 
   const fetchDeptList = async () => {
@@ -42,15 +42,21 @@ function Home() {
       setDeptList(res.data);
     });
   };
-
+  let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
+  let stomp = Stomp.over(sockJS);
   useEffect(() => {
     fetchDeptList();
-    const socket = new SockJS("/ws"); // 스프링 부트 서버 주소에 맞게 변경
-    const stomp = Stomp.over(socket);
 
     stomp.connect({}, () => {
       console.log("WebSocket Connected");
       setStompClient(stomp);
+
+      stomp.subscribe(`/topic/currentMember/1`, (message) => {
+        console.log("Received Data:", message);
+        //받은 데이터를 현재 출근중인 멤버리스트에 저장
+        // const receivedData = JSON.parse(message.body);
+        // setWorkingMembers(receivedData);
+      });
     });
 
     return () => {
@@ -58,7 +64,7 @@ function Home() {
         stompClient.disconnect();
       }
     };
-  }, []);
+  }, [deptID]);
   return (
     <div>
       <Nav />
@@ -72,9 +78,6 @@ function Home() {
             className="form-select"
             aria-label="Default select example"
           >
-            <option disabled selected value="">
-              부서선택
-            </option>
             {deptList.map((dept) => {
               return (
                 <option key={dept.id} value={dept.id}>
