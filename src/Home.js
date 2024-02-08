@@ -26,15 +26,6 @@ function Home() {
   const [webSocket, setWebSocket] = useState(null);
   const handleDeptChange = (event) => {
     setDeptID(event.target.value);
-    // stompClient.subscribe(
-    //   `/topic/currentMember/${event.target.value}`,
-    //   (message) => {
-    //     const receivedData = JSON.parse(message.body);
-    //     console.log("Received Data:", receivedData);
-    //     // 받은 데이터를 상태나 다른 곳에 적용하세요.
-    //     setWorkingMembers(receivedData);
-    //   }
-    // );
   };
 
   const fetchDeptList = async () => {
@@ -44,33 +35,34 @@ function Home() {
   };
   let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
   let stomp = Stomp.over(sockJS);
+  stomp.connect({}, () => {
+    console.log("WebSocket Connected");
+    setStompClient(stomp);
+
+    stomp.subscribe(`/topic/currentMember/1`, (message) => {
+      console.log("여기 들어왔는지?");
+      console.log("Received Data:", message.body);
+      //받은 데이터를 현재 출근중인 멤버리스트에 저장
+      const receivedData = JSON.parse(message.body);
+      setWorkingMembers(receivedData);
+    });
+
+    stomp.send(`/app/dept`, {}, JSON.stringify({ deptId: 1 }));
+  });
   useEffect(() => {
     fetchDeptList();
 
-    stomp.connect({}, () => {
-      console.log("WebSocket Connected");
-      setStompClient(stomp);
-
-      stomp.subscribe(`/topic/currentMember/1`, (message) => {
-        console.log("Received Data:", message);
-        //받은 데이터를 현재 출근중인 멤버리스트에 저장
-        // const receivedData = JSON.parse(message.body);
-        // setWorkingMembers(receivedData);
-      });
-    });
-
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect();
-      }
-    };
+    // return () => {
+    //   if (stompClient) {
+    //     stompClient.disconnect();
+    //   }
+    // };
   }, [deptID]);
   return (
     <div>
       <Nav />
       <div className="container px-4 px-lg-5">
         {/* Heading Row */}
-
         <div className="col">
           {" "}
           <select
