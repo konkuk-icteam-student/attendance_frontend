@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useEffect, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./css/styles.css";
+// import "./css/styles.css";
 import Board from "../src/component/Board";
 import client from "./util/clients";
 import Stomp from "stompjs";
