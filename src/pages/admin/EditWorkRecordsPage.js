@@ -74,13 +74,15 @@ function EditWorkRecords() {
   const handleSelectRow = (rowData) => {
     console.log("rowData", rowData);
     setSelectedRowData(rowData);
-    if (rowData.workDuration == null) {
-      alert("누락된 데이터는 Add 버튼을 통해 추가해주세요.");
-      return;
-    } else if (flag == null) {
+
+    if (
+      rowData.arriveAttendance.status != null ||
+      rowData.leaveAttendance.status != null
+    ) {
+      setEditModalOpen(true);
       return;
     } else {
-      setEditModalOpen(true);
+      alert("출근 또는 퇴근 기록이 없습니다.");
       return;
     }
   };
@@ -93,7 +95,10 @@ function EditWorkRecords() {
   const handleModalEditClick = async (data) => {
     console.log(data, flag);
 
-    if (flag == "출근") {
+    if (
+      data.arriveAttendance.status != null &&
+      data.arriveAttendance.status == "1"
+    ) {
       //api 요청시 필요한 형식에 맞게 body 수정
 
       const arriveBody = {
@@ -122,7 +127,10 @@ function EditWorkRecords() {
             "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
           );
         });
-    } else if (flag == "퇴근") {
+    } else if (
+      data.leaveAttendance.status != null &&
+      data.leaveAttendance.status == "0"
+    ) {
       //api 요청시 필요한 형식에 맞게 body 수정
       const leaveBody = {
         attendanceDate: data.arriveAttendance.attendanceDate,
@@ -326,23 +334,12 @@ function EditWorkRecords() {
     console.log("Selected Date:", newValue);
 
     setAttendanceDateToCheck(newValue);
-    if (selectedStudentId) {
-      console.log("selectedStudentId", selectedStudentId);
-      await handleSelectStudent(
-        { target: { value: selectedStudentId } },
-        newValue
-      );
-    } else {
-      console.log("test?");
-    }
+    setSelectedStudentId(null);
+    const selectBox = document.getElementById("studentSelectBox");
+    selectBox.selectedIndex = 0;
   };
   useEffect(() => {
-    // const fetchStudentAndData = async () => {
-    //   await fetchStudentList();
-    //   // setIsDataLoaded(true);
-    // };
     fetchStudentList();
-    // fetchStudentAndData();
   }, []);
 
   return (
@@ -395,6 +392,7 @@ function EditWorkRecords() {
               className="form-select"
               aria-label="Default select example"
               onChange={handleSelectStudent}
+              id="studentSelectBox"
             >
               <option value="" disabled selected>
                 학생 선택
