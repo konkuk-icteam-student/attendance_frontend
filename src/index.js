@@ -9,7 +9,7 @@ import {
   BrowserRouter,
 } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./css/styles.css";
+// import "./css/styles.css";
 import Nav from "./component/Nav";
 import Home from "./Home";
 import Login from "./pages/common/LoginPage";
