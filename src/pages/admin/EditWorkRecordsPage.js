@@ -74,17 +74,19 @@ function EditWorkRecords() {
   const handleSelectRow = (rowData) => {
     console.log("rowData", rowData);
     setSelectedRowData(rowData);
+    setEditModalOpen(true);
+  };
+  const handleDeleteSelectRow = (rowData) => {
+    console.log("rowData", rowData);
+    setSelectedRowData(rowData);
 
-    if (
-      rowData.arriveAttendance.status != null ||
-      rowData.leaveAttendance.status != null
-    ) {
-      setEditModalOpen(true);
-      return;
-    } else {
-      alert("출근 또는 퇴근 기록이 없습니다.");
-      return;
-    }
+    // if (rowData.workDuration != undefined) {
+    //   setEditModalOpen(true);
+    //   return;
+    // } else {
+    //   alert("출근 또는 퇴근 기록이 없습니다.");
+    //   return;
+    // }
   };
   const handleSelectedColHeader = (selectedColHeader) => {
     setFlag(selectedColHeader);
@@ -93,24 +95,15 @@ function EditWorkRecords() {
   /**Modal에서 시간이 수정된 데이터를 받아와서 api 호출
   근로 시간 수정 모달의 edit 확인 버튼 클릭시 호출됨**/
   const handleModalEditClick = async (data) => {
-    console.log(data, flag);
+    console.log("daaaaa", data, flag);
 
-    if (
-      data.arriveAttendance.status != null &&
-      data.arriveAttendance.status == "1"
-    ) {
-      //api 요청시 필요한 형식에 맞게 body 수정
-
+    if (flag == "출근") {
       const arriveBody = {
         attendanceDate: data.arriveAttendance.attendanceDate,
-
-        attendanceTime: formatTimeForServer(
-          data.arriveAttendance.attendanceTime
-        ),
-
+        attendanceTime:
+          data.arriveAttendance.attendanceDate + " " + data.attendanceTime,
         status: 1,
       };
-      //출근 시간 수정 api 호출
       await client
         .patch(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
         .then((res) => {
@@ -122,26 +115,15 @@ function EditWorkRecords() {
         })
         .catch((err) => {
           console.log("err", err);
-          console.log(arriveBody);
-          alert(
-            "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
-          );
+          alert("날짜, 시간, 퇴근 여부 정보를 잘 입력하였는지 확인해주세요.");
         });
-    } else if (
-      data.leaveAttendance.status != null &&
-      data.leaveAttendance.status == "0"
-    ) {
-      //api 요청시 필요한 형식에 맞게 body 수정
+    } else if (flag == "퇴근") {
       const leaveBody = {
-        attendanceDate: data.arriveAttendance.attendanceDate,
-
-        attendanceTime: formatTimeForServer(
-          data.leaveAttendance.attendanceTime
-        ),
-
+        attendanceDate: data.leaveAttendance.attendanceDate,
+        attendanceTime:
+          data.leaveAttendance.attendanceDate + " " + data.attendanceTime,
         status: 0,
       };
-      //퇴근 시간 수정 api 호출
       await client
         .patch(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
         .then((res) => {
@@ -153,14 +135,8 @@ function EditWorkRecords() {
         })
         .catch((err) => {
           console.log("err", err);
-          alert(
-            "날짜, 시간, 출근/퇴근 여부 정보를 잘 입력하였는지 확인해주세요."
-          );
+          alert("날짜, 시간, 퇴근 여부 정보를 잘 입력하였는지 확인해주세요.");
         });
-    } else {
-      console.log(
-        "EditWorkRecordsPage.js: 129: flag is null 129번째 줄 확인필요!"
-      );
     }
 
     setEditModalOpen(false);
@@ -226,14 +202,17 @@ function EditWorkRecords() {
       await client
         .delete(`/user/attendance/${selectedRowData.leaveAttendance.id}`)
         .then(alert("출/퇴근 기록 삭제되었습니다."));
+      setSelectedRowData(null);
     } else if (selectedRowData.arriveAttendance.id) {
       await client
         .delete(`/user/attendance/${selectedRowData.arriveAttendance.id}`)
         .then(alert("출근 기록 삭제되었습니다."));
+      setSelectedRowData(null);
     } else if (selectedRowData.leaveAttendance.id) {
       await client
         .delete(`/user/attendance/${selectedRowData.leaveAttendance.id}`)
         .then(alert("퇴근 기록 삭제되었습니다."));
+      setSelectedRowData(null);
     }
 
     handleSelectStudent(
@@ -418,6 +397,7 @@ function EditWorkRecords() {
                 columns={TableColumns}
                 data={workTimeData}
                 onEditClick={handleSelectRow}
+                onDeleteClick={handleDeleteSelectRow}
                 flag={handleSelectedColHeader}
               />
               <div className="row justify-content-end mt-3">

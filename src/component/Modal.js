@@ -35,6 +35,7 @@ const ModalComponent = React.memo(
       setEditDate(data);
     };
     const handleEditTime = (data) => {
+      console.log("handle datetime", data);
       setEditAttendanceTime(dayjs(data).format("HH:mm"));
     };
     const handleAttendanceStatus = (attendanceStatus) => {

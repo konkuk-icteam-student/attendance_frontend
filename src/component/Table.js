@@ -1,21 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTable } from "react-table";
 import styles from "../css/Table.module.css";
-function Table({ columns, data, onEditClick, flag }) {
+function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const handleRowClick = (row) => {
-    onEditClick(row.original);
+  const handleRowClick = (clickedData) => {
+    console.log("handlerowclick실행", clickedData.original);
+    onEditClick(clickedData);
+  };
+  const handleDeleteRowClick = (clickedData) => {
+    console.log("table row 클릭", "deleterowclick실행");
+    onEditClick(clickedData.original);
   };
   const handleRadioChange = (rowId) => {
+    console.log(rowId, "table row 클릭");
     setSelectedRow(rowId);
   };
   const handleFieldClick = (selectedColHeader) => {
     flag(selectedColHeader);
     console.log("selectedColHeader", selectedColHeader);
   };
+  useEffect(() => {
+    console.log("selectedRow", selectedRow);
+    // setSelectedRow(null);
+  }, [data]);
   return (
     <table className="table" {...getTableProps()}>
       <thead>
@@ -36,7 +46,7 @@ function Table({ columns, data, onEditClick, flag }) {
               key={rowIdx}
               {...row.getRowProps()}
               onClick={() => {
-                handleRowClick(row);
+                handleDeleteRowClick(row);
                 handleRadioChange(row.id);
               }}
             >
@@ -45,7 +55,10 @@ function Table({ columns, data, onEditClick, flag }) {
                   type="radio"
                   name="selectRow"
                   checked={selectedRow === row.id}
-                  onChange={() => handleRadioChange(row.id)}
+                  // onChange={() => {
+                  //   handleDeleteRowClick(row);
+                  //   handleRadioChange(row.id);
+                  // }}
                 />
               </td>
               {row.cells.map((cell) =>
@@ -54,7 +67,15 @@ function Table({ columns, data, onEditClick, flag }) {
                   <td
                     className={styles.hoverable_cell}
                     onClick={() => {
-                      handleRowClick(row);
+                      console.log("table row 클릭 cell row", row.original);
+                      if (
+                        cell.column.id === "arriveAttendance.attendanceTime"
+                      ) {
+                        handleRowClick(row.original.arriveAttendance);
+                      } else {
+                        handleRowClick(row.original.leaveAttendance);
+                      }
+
                       handleFieldClick(cell.column.Header);
                     }}
                     {...cell.getCellProps()}

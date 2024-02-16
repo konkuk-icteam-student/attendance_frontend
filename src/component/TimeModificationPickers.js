@@ -47,52 +47,14 @@ function TimeModificationPickers({
     },
   };
   const handleEditTime = (data) => {
-    if (selectedHeader === "출근") {
-      const updatedData = {
-        ...UpdatedAttendanceData,
-        arriveAttendance: {
-          ...UpdatedAttendanceData.arriveAttendance,
-          attendanceTime:
-            UpdatedAttendanceData.arriveAttendance.attendanceDate +
-            "T" +
-            dayjs(data).format("HH:mm") +
-            ":00.000",
-        },
-        // leaveAttendance: {
-        //   ...UpdatedAttendanceData.leaveAttendance,
-        //   attendanceTime:
-        //     UpdatedAttendanceData.leaveAttendance.attendanceDate +
-        //     "T" +
-        //     dayjs(data).format("HH:mm") +
-        //     ":00.000",
-        // },
-      };
-      setUpdateAttendanceData(updatedData);
-      updatedTimeData(updatedData);
-      console.log("updatedData", updatedData);
-    } else {
-      const updatedData = {
-        ...UpdatedAttendanceData,
-        // arriveAttendance: {
-        //   ...UpdatedAttendanceData.arriveAttendance,
-        //   attendanceTime:
-        //     UpdatedAttendanceData.arriveAttendance.attendanceDate +
-        //     "T" +
-        //     dayjs(data).format("HH:mm") +
-        //     ":00.000",
-        // },
-        leaveAttendance: {
-          ...UpdatedAttendanceData.leaveAttendance,
-          attendanceTime:
-            UpdatedAttendanceData.leaveAttendance.attendanceDate +
-            "T" +
-            dayjs(data).format("HH:mm") +
-            ":00.000",
-        },
-      };
-      setUpdateAttendanceData(updatedData);
-      updatedTimeData(updatedData);
-    }
+    console.log("updatedat", data);
+
+    const updatedata = {
+      ...UpdatedAttendanceData,
+      attendanceTime: dayjs(data).format("HH:mm") + ":00.000",
+    };
+
+    updatedTimeData(updatedata);
   };
   const handleEditDate = (data) => {
     console.log("date", data);
@@ -133,11 +95,6 @@ function TimeModificationPickers({
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
-        defaultValue={
-          defaultdata.arriveAttendance.attendanceDate
-            ? dayjs(defaultdata.arriveAttendance.attendanceDate)
-            : dayjs(defaultdata.leaveAttendance.attendanceDate)
-        }
         onChange={(data) => {
           handleEditDate(data);
         }}
