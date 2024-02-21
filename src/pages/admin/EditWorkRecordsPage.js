@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import dayjs from "dayjs";
 import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
-
 import styles from "../../css/EditWorkRecords.module.css";
 import { formatTime, formatTimeForServer } from "../../util/stringUtils";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -42,7 +41,6 @@ function EditWorkRecords() {
 
   //근로 시간 데이터 임시 저장소(학생을 선택할 때마다 초기화, 백엔드에서 받아온 데이터 정제 필요해서 만듦)
   const groupedData = [];
-
   const TableColumns = [
     {
       accessor: (row) =>
@@ -78,14 +76,13 @@ function EditWorkRecords() {
   ];
   //테이블에서 edit할 col 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
-    console.log("rowData", rowData);
+    console.log("rowSelect함수실행중임 왜??");
     setSelectedRowData(rowData);
     setEditModalOpen(true);
   };
   const handleDeleteSelectRow = (rowData) => {
     console.log("rowData", rowData);
     setSelectedRowData(rowData);
-
     // if (rowData.workDuration != undefined) {
     //   setEditModalOpen(true);
     //   return;
@@ -255,6 +252,7 @@ function EditWorkRecords() {
                 1. 출근 기록이 없는 경우
                 2. 퇴근 기록이 없는 경우
                 3. 둘 다 정상 값이 들어오는 경우 **/
+
             res.data.attendanceDataList.forEach((item, index) => {
               if (item.arriveAttendance == null) {
                 groupedItem = {
@@ -314,13 +312,13 @@ function EditWorkRecords() {
               groupedData.push(groupedItem);
             });
           }
-
           setWorkTimeData(groupedData);
 
           // setWorkTimeData([...groupedData, { totalWorkTime: formatTime(res.data.totalDuration) }]);
         });
     } else {
       console.log("date not choose");
+
       alert("날짜가 선택되지 않았습니다. 날짜를 선택해주세요.");
     }
   };
