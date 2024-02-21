@@ -41,7 +41,7 @@ function DepartmentManagementPage() {
     }
   };
   const handleDeleteDept = async () => {
-    const response = await client.delete(`/dept/${deptOID}`).then((res) => {
+    await client.delete(`/dept/${deptOID}`).then((res) => {
       alert("부서 삭제 완료");
       fetchDeptList();
     });
