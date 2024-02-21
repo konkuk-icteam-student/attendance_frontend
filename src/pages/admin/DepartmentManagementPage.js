@@ -56,9 +56,7 @@ function DepartmentManagementPage() {
   };
   useEffect(() => {
     fetchDeptList();
-  }, []);
-  if (loading) return <div>로딩중...</div>;
-  if (error) return <div>에러 발생!</div>;
+  }, [loading]);
 
   return (
     <div>
@@ -106,9 +104,10 @@ function DepartmentManagementPage() {
           onChange={handleDeptChange}
           className="form-select"
           aria-label="Default select example"
+          style={{ width: "50%" }}
         >
           <option disabled selected value="">
-            부서선택
+            삭제할 부서선택
           </option>
 
           {deptList.map((dept) => {
@@ -116,21 +115,25 @@ function DepartmentManagementPage() {
               <option
                 key={dept.id}
                 value={dept.id}
-                disabled={StoredDeptID != dept.id}
+                // disabled={StoredDeptID != dept.id}
               >
                 {dept.deptName}
               </option>
             );
           })}
         </select>
+      </InputGroup>
+
+      <div className="row justify-content-end mt-3">
+        <button
+          className="btn btn-outline-secondary"
+          type="button"
+          style={{ width: "10%", marginRight: "25%" }}
+          onClick={handleDeleteDept}
+        >
+          부서 삭제
+        </button>
       </div>
-      <button
-        className="mx-auto"
-        disabled={!deptOID}
-        onClick={handleDeleteDept}
-      >
-        부서 삭제버튼{" "}
-      </button>
     </div>
   );
 }
