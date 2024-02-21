@@ -63,12 +63,17 @@ function EditWorkRecords() {
       accessor: "workDuration",
       Header: "근로시간",
     },
+    // {
+    //   accessor: "totalWorkTime",
+    //   Header: "총 근로시간",
+    // },
   ];
   const CSVHeaders = [
     { label: "날짜", key: "arriveAttendance.attendanceDate" },
     { label: "출근", key: "arriveAttendance.attendanceTime" },
     { label: "퇴근", key: "leaveAttendance.attendanceTime" },
     { label: "근로시간", key: "workDuration" },
+    { label: "총 근로시간", key: "totalWorkTime" }, // Add this line
   ];
   //테이블에서 row 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
@@ -298,12 +303,20 @@ function EditWorkRecords() {
                   workDuration: formatTime(item.workDuration),
                 };
               }
-
+              groupedItem.totalWorkTime = formatTime(res.data.totalDuration);
+              //groupItem에 totalWorkTime 추가
+              if (index == 0) {
+                groupedItem.totalWorkTime = formatTime(res.data.totalDuration);
+              } else {
+                groupedItem.totalWorkTime = "";
+              }
               groupedData.push(groupedItem);
             });
           }
 
           setWorkTimeData(groupedData);
+
+          // setWorkTimeData([...groupedData, { totalWorkTime: formatTime(res.data.totalDuration) }]);
         });
     } else {
       console.log("date not choose");
@@ -401,22 +414,10 @@ function EditWorkRecords() {
                 onDeleteClick={handleDeleteSelectRow}
                 flag={handleSelectedColHeader}
               />
-              <div className="row justify-content-end mt-3">
-                총 근로: {TotalWorkTime}
-              </div>
-              {/* <div className="row justify-content-end mt-3">
-                <button
-                  className="btn btn-outline-secondary"
-                  type="button"
-                  style={{ width: "25%" }}
-                  onClick={() => {
-                    setEditModalOpen(true);
-                  }}
-                  disabled={!selectedRowData}
-                >
-                  Edit
-                </button>
-              </div> */}
+              <h5 className="row justify-content-end mt-3">
+                총 근로시간: {TotalWorkTime}
+              </h5>
+
               <div className="row justify-content-end mt-3">
                 <button
                   className="btn btn-outline-secondary"
