@@ -1,13 +1,6 @@
-import React, { useEffect, useState } from "react";
-
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
+import React, { useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers";
-import { MultiInputTimeRangeField } from "@mui/x-date-pickers-pro";
 import dayjs from "dayjs";
-import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
-import { styled } from "@mui/material/styles";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -82,17 +75,6 @@ function TimeModificationPickers({
     setUpdateAttendanceData(updatedData);
     updatedTimeData(updatedData);
   };
-  useEffect(() => {
-    console.log("select???", selectedHeader);
-    console.log("defaultdata", defaultdata);
-    // console.log(
-    //   defaultdata.arriveAttendance.attendanceDate +
-    //     "T" +
-    //     defaultdata.arriveAttendance.attendanceTime.format("HH:mm") +
-    //     ":00.000"
-    // );
-  });
-  // console.log("timepicker", defaultdata);
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
@@ -115,13 +97,6 @@ function TimeModificationPickers({
         &nbsp;
         <TimePicker
           label="출근 time picker"
-          // defaultValue={
-          //   defaultdata.arriveAttendance.attendanceTime
-          //     ? defaultdata.arriveAttendance.attendanceDate +
-          //       "T" +
-          //       defaultdata.arriveAttendance.attendanceTime
-          //     : undefined
-          // }
           onChange={(data) => {
             console.log("timedata", data);
             // dateChange(data);
@@ -136,13 +111,6 @@ function TimeModificationPickers({
         />
         <TimePicker
           label="퇴근 time picker"
-          // defaultValue={
-          //   defaultdata.leaveAttendance.attendanceTime
-          //     ? defaultdata.leaveAttendance.attendanceDate +
-          //       "T" +
-          //       defaultdata.leaveAttendance.attendanceTime
-          //     : undefined
-          // }
           onChange={(data) => {
             console.log("timedata", data);
             handleEditTime(data);
@@ -154,16 +122,6 @@ function TimeModificationPickers({
               defaultdata.leaveAttendance.attendanceTime
           )}
         />
-        {/* <MultiInputTimeRangeField
-          defaultValue={[
-            dayjs(defaultdata.arriveAttendance.attendanceTime),
-            dayjs(defaultdata.leaveAttendance.attendanceTime),
-          ]}
-          onChange={(data) => {
-            console.log("timedata", data);
-            handleEditTime(data);
-          }}
-        /> */}
       </DemoContainer>
     </LocalizationProvider>
   );
