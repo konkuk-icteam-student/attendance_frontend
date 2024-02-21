@@ -21,16 +21,16 @@ function Home() {
     const storedDeptID = localStorage.getItem("deptID");
 
     // 만약 값이 존재한다면 해당 값을 반환, 없으면 0을 반환
-    return storedDeptID ? parseInt(storedDeptID) : 0;
+    return storedDeptID ? parseInt(storedDeptID) : 1;
   });
   const [deptName, setDeptName] = useState(() => {
     const storedDeptName = localStorage.getItem("deptName");
-    return storedDeptName ? storedDeptName : "";
+    return storedDeptName ? storedDeptName : "정보운영팀";
   });
   const [checkSocketLogin, setCheckSocketLogin] = useState(false);
   const ws = useRef(null); //webSocket을 담는 변수,
   const [stompClient, setStompClient] = useState(null);
-
+  const [allMembers, setAllMembers] = useState([]);
   const [webSocket, setWebSocket] = useState(null);
   let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
   let stomp = Stomp.over(sockJS);
@@ -49,7 +49,13 @@ function Home() {
       console.log(res.data);
     });
   };
-
+  //부서별 전체 학생 조회
+  const fetchAllMembers = async () => {
+    client.get(`/dept/${deptID}`).then((res) => {
+      console.log("all members", res.data);
+      setAllMembers(res.data.users);
+    });
+  };
   useEffect(() => {
     fetchDeptList();
     if (deptID === undefined) {
@@ -57,7 +63,7 @@ function Home() {
       window.localStorage.setItem("deptID", deptID);
       window.localStorage.setItem("deptName", deptName);
     }
-
+    fetchAllMembers();
     stomp.connect({}, () => {
       console.log("WebSocket Connected");
       setStompClient(stomp);
@@ -128,7 +134,14 @@ function Home() {
           </div>
         </div>
         <h4 className=" m-0">전체 근로생</h4>
-        <Board />
+        {
+          //부서별 전체 근로생 조회
+          !allMembers ? (
+            <div>로딩중...</div>
+          ) : (
+            <Board deptMembers={allMembers} />
+          )
+        }
       </div>
     </div>
   );
