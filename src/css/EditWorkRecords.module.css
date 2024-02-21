@@ -1,0 +1,9 @@
+#deleteButton {
+  position: relative;
+  z-index: 2;
+}
+#studentSelectBox {
+  height: 56px;
+  padding: auto;
+  margin-bottom: 10px;
+}
