@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import client from "../../util/clients";
 import ExportCSV from "../../component/ExportCSV";
 
+import styles from "../../css/EditWorkRecords.module.css";
 import { formatTime, formatTimeForServer } from "../../util/stringUtils";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -75,7 +76,7 @@ function EditWorkRecords() {
     { label: "근로시간", key: "workDuration" },
     { label: "총 근로시간", key: "totalWorkTime" }, // Add this line
   ];
-  //테이블에서 row 선택시 호출되는 함수
+  //테이블에서 edit할 col 선택시 호출되는 함수
   const handleSelectRow = (rowData) => {
     console.log("rowData", rowData);
     setSelectedRowData(rowData);
@@ -327,9 +328,7 @@ function EditWorkRecords() {
     console.log("Selected Date:", newValue);
 
     setAttendanceDateToCheck(newValue);
-    setSelectedStudentId(null);
-    const selectBox = document.getElementById("studentSelectBox");
-    selectBox.selectedIndex = 0;
+    // setSelectedStudentId(null);
   };
   useEffect(() => {
     fetchStudentList();
@@ -385,7 +384,8 @@ function EditWorkRecords() {
               className="form-select"
               aria-label="Default select example"
               onChange={handleSelectStudent}
-              id="studentSelectBox"
+              id={styles.studentSelectBox}
+              disabled={!attendanceDateToCheck}
             >
               <option value="" disabled selected>
                 학생 선택
