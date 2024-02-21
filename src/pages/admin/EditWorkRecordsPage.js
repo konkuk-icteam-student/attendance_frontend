@@ -19,8 +19,6 @@ function EditWorkRecords() {
   //모달 오픈 여부
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  //선택된 학생 이름
-  const [selectedStudentValue, setSelectedStudentValue] = useState(null);
   //선택된 학생 아이디(학번)
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   //선택된 row
@@ -111,10 +109,7 @@ function EditWorkRecords() {
         .patch(`/user/attendance/${data.arriveAttendance.id}`, arriveBody)
         .then((res) => {
           alert("수정되었습니다.");
-          handleSelectStudent(
-            { target: { value: selectedStudentId } },
-            attendanceDateToCheck
-          );
+          handleSelectStudent({ target: { value: selectedStudentId } });
         })
         .catch((err) => {
           console.log("err", err);
@@ -131,10 +126,7 @@ function EditWorkRecords() {
         .patch(`/user/attendance/${data.leaveAttendance.id}`, leaveBody)
         .then((res) => {
           alert("수정되었습니다.");
-          handleSelectStudent(
-            { target: { value: selectedStudentId } },
-            attendanceDateToCheck
-          );
+          handleSelectStudent({ target: { value: selectedStudentId } });
         })
         .catch((err) => {
           console.log("err", err);
@@ -164,10 +156,7 @@ function EditWorkRecords() {
       .post(`/user/admin-attendance`, body)
       .then((res) => {
         alert("추가되었습니다.");
-        handleSelectStudent(
-          { target: { value: selectedStudentId } },
-          attendanceDateToCheck
-        );
+        handleSelectStudent({ target: { value: selectedStudentId } });
       })
       .catch((err) => {
         console.log("err", err);
@@ -219,14 +208,11 @@ function EditWorkRecords() {
       setSelectedRowData(null);
     }
 
-    handleSelectStudent(
-      { target: { value: selectedStudentId } },
-      attendanceDateToCheck
-    );
+    handleSelectStudent({ target: { value: selectedStudentId } });
   };
 
   //select 박스에서 선택된 학생의 아이디로 근로 시간 데이터 가져오기
-  const handleSelectStudent = async (event, dateData) => {
+  const handleSelectStudent = async (event) => {
     setSelectedStudentId(event.target.value);
 
     if (attendanceDateToCheck) {
@@ -323,10 +309,10 @@ function EditWorkRecords() {
     }
   };
   const handleAttendanceDateToCheck = async (newValue) => {
-    console.log("Selected Date:", newValue);
-
     setAttendanceDateToCheck(newValue);
-    // setSelectedStudentId(null);
+    setSelectedStudentId(null);
+    //studentSelectbox index 초기화
+    document.getElementById(styles.studentSelectBox).selectedIndex = 0;
   };
   useEffect(() => {
     fetchStudentList();
