@@ -48,11 +48,6 @@ const ModalComponent = React.memo(
           sx={{ ...style }}
           className={styles.modal_content}
           ref={modalBackground}
-          onClick={(e) => {
-            if (e.target === modalBackground.current) {
-              onClose();
-            }
-          }}
         >
           <h2>{title}</h2>
           <br />
