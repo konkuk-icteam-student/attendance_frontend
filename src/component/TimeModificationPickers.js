@@ -84,6 +84,7 @@ function TimeModificationPickers({
   };
   useEffect(() => {
     console.log("select???", selectedHeader);
+    console.log("defaultdata", defaultdata);
     // console.log(
     //   defaultdata.arriveAttendance.attendanceDate +
     //     "T" +
@@ -99,6 +100,7 @@ function TimeModificationPickers({
           handleEditDate(data);
         }}
         disabled={selectedHeader !== "날짜"}
+        defaultValue={dayjs(defaultdata.arriveAttendance.attendanceDate)}
       />
       <DemoContainer
         components={[
@@ -126,6 +128,11 @@ function TimeModificationPickers({
             handleEditTime(data);
           }}
           disabled={selectedHeader !== "출근"}
+          defaultValue={dayjs(
+            defaultdata.arriveAttendance.attendanceDate +
+              "T" +
+              defaultdata.arriveAttendance.attendanceTime
+          )}
         />
         <TimePicker
           label="퇴근 time picker"
@@ -137,11 +144,15 @@ function TimeModificationPickers({
           //     : undefined
           // }
           onChange={(data) => {
-            // dateChange(data);
-
+            console.log("timedata", data);
             handleEditTime(data);
           }}
           disabled={selectedHeader !== "퇴근"}
+          defaultValue={dayjs(
+            defaultdata.leaveAttendance.attendanceDate +
+              "T" +
+              defaultdata.leaveAttendance.attendanceTime
+          )}
         />
         {/* <MultiInputTimeRangeField
           defaultValue={[
