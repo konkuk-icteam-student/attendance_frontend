@@ -418,6 +418,11 @@ function EditWorkRecords() {
                 <button
                   className="btn btn-outline-secondary"
                   type="button"
+                  id={
+                    !selectedRowData
+                      ? styles.disabled_deleteButton
+                      : styles.deleteButton
+                  }
                   style={{ width: "25%" }}
                   onClick={handleDeleteButtonClick}
                   disabled={!selectedRowData}
