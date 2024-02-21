@@ -9,27 +9,23 @@ export const formatTime = (time) => {
     let hour = time.split("H")[0].replace("PT", "");
     let minute = time.split("H")[1].split("M")[0];
     let second = time.split("M")[1].split("S")[0];
-    if (hour.length === 1) hour = "0" + hour;
-    else if (hour.length === 0) hour = "00";
+    if (hour.length === 0) hour = "0";
 
-    if (minute.length === 1) minute = "0" + minute;
-    else if (minute.length === 0) minute = "00";
+    if (minute.length === 0) minute = "0";
 
     return `${hour}시간 ${minute}분`;
   } else if (time.includes("H")) {
     let hour = time.split("H")[0].replace("PT", "");
-    if (hour.length === 1) hour = "0" + hour;
-    else if (hour.length === 0) hour = "00";
+    if (hour.length === 0) hour = "0";
 
     return `${hour}시간`;
   } else if (time.includes("M")) {
     let minute = time.split("M")[0].replace("PT", "");
-    if (minute.length === 1) minute = "0" + minute;
-    else if (minute.length === 0) minute = "00";
+    if (minute.length === 0) minute = "0";
 
     return `${minute}분`;
   } else {
-    return "0시간 0분";
+    return "0분";
   }
 };
 
