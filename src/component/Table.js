@@ -7,7 +7,7 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleRowClick = (clickedData) => {
-    console.log("handlerowclick실행", clickedData.original);
+    console.log("handlerowclick실행", clickedData);
     onEditClick(clickedData);
   };
   const handleDeleteRowClick = async (clickedData) => {
@@ -26,8 +26,7 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
   };
   useEffect(() => {
     console.log("selectedRow", selectedRow);
-    // setSelectedRow(null);
-  }, [data]);
+  }, []);
   return (
     <table className="table" {...getTableProps()}>
       <thead>
@@ -59,31 +58,46 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
                   checked={selectedRow === row.id}
                 />
               </td>
-              {row.cells.map((cell) =>
-                cell.column.id === "arriveAttendance.attendanceTime" ||
-                cell.column.id === "leaveAttendance.attendanceTime" ? (
-                  <td
-                    className={styles.hoverable_cell}
-                    onClick={() => {
-                      console.log("table row 클릭 cell row", row.original);
-                      if (
-                        cell.column.id === "arriveAttendance.attendanceTime"
-                      ) {
-                        handleRowClick(row.original.arriveAttendance);
-                      } else {
-                        handleRowClick(row.original.leaveAttendance);
-                      }
+              {row.cells.map((cell) => {
+                let isPossibleToClick = false;
 
-                      handleFieldClick(cell.column.Header);
-                    }}
+                if (
+                  (cell.column.id === "arriveAttendance.attendanceTime" &&
+                    cell.row.original.arriveAttendance.attendanceTime !=
+                      undefined) ||
+                  (cell.column.id === "leaveAttendance.attendanceTime" &&
+                    cell.row.original.leaveAttendance.attendanceTime !=
+                      undefined)
+                ) {
+                  isPossibleToClick = true;
+                }
+
+                return (
+                  <td
+                    key={cell.column.id}
+                    className={isPossibleToClick ? styles.hoverable_cell : ""}
+                    onClick={
+                      isPossibleToClick
+                        ? () => {
+                            console.log("table row 클릭 cell row", cell);
+                            if (
+                              cell.column.id ===
+                              "arriveAttendance.attendanceTime"
+                            ) {
+                              handleRowClick(row.original.arriveAttendance);
+                            } else {
+                              handleRowClick(row.original.leaveAttendance);
+                            }
+                            handleFieldClick(cell.column.Header);
+                          }
+                        : undefined
+                    }
                     {...cell.getCellProps()}
                   >
                     {cell.render("Cell")}
                   </td>
-                ) : (
-                  <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
-                )
-              )}
+                );
+              })}
             </tr>
           );
         })}
