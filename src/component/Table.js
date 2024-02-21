@@ -10,9 +10,11 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
     console.log("handlerowclick실행", clickedData.original);
     onEditClick(clickedData);
   };
-  const handleDeleteRowClick = (clickedData) => {
-    console.log("table row 클릭", "deleterowclick실행");
-    onEditClick(clickedData.original);
+  const handleDeleteRowClick = async (clickedData) => {
+    console.log("table row 클릭", "deleterowclick실행", clickedData.original);
+    await onDeleteClick(clickedData.original);
+    // setSelectedRow(null);
+    console.log("selectedRow null인지 확인", selectedRow);
   };
   const handleRadioChange = (rowId) => {
     console.log(rowId, "table row 클릭");
@@ -55,10 +57,6 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
                   type="radio"
                   name="selectRow"
                   checked={selectedRow === row.id}
-                  // onChange={() => {
-                  //   handleDeleteRowClick(row);
-                  //   handleRadioChange(row.id);
-                  // }}
                 />
               </td>
               {row.cells.map((cell) =>

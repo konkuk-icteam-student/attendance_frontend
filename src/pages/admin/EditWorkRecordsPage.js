@@ -192,6 +192,7 @@ function EditWorkRecords() {
   };
   //근로 시간 삭제 api 호출
   const handleDeleteButtonClick = async () => {
+    console.log("지금 딜리트 ㅎ츌:", selectedRowData);
     if (
       selectedRowData.arriveAttendance.id &&
       selectedRowData.leaveAttendance.id
