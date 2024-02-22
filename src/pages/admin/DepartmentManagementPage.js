@@ -91,7 +91,7 @@ function DepartmentManagementPage() {
         <button
           className="btn btn-outline-secondary"
           type="button"
-          style={{ width: "10%", marginRight: "25%" }}
+          style={{ width: "16%", marginRight: "25%" }}
           onClick={handleAddDept}
         >
           부서 추가
@@ -128,7 +128,7 @@ function DepartmentManagementPage() {
         <button
           className="btn btn-outline-secondary"
           type="button"
-          style={{ width: "10%", marginRight: "25%" }}
+          style={{ width: "16%", marginRight: "25%" }}
           onClick={handleDeleteDept}
         >
           부서 삭제

@@ -70,11 +70,11 @@ function App() {
           <div className="col-md-4 mb-5">
             <div className="card h-100">
               <div className="card-body">
-                <h2 className="card-title">기능4</h2>
-                <p className="card-text">기능4</p>
+                <h2 className="card-title">회원 삭제</h2>
+                <p className="card-text">회원을 삭제하는 페이지</p>
               </div>
               <div className="card-footer">
-                <a className="btn btn-primary btn-sm" href="#!">
+                <a className="btn btn-primary btn-sm" href="user-manage">
                   More Info
                 </a>
               </div>

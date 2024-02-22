@@ -17,6 +17,7 @@ import Manage from "./pages/admin/ManagementListPage";
 import Signup from "./pages/common/SignupPage";
 import EditWorkRecords from "./pages/admin/EditWorkRecordsPage";
 import DepartmentManagementPage from "./pages/admin/DepartmentManagementPage";
+import UserManagementPage from "./pages/admin/UserManagementPage";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -66,6 +67,15 @@ root.render(
           <div>
             <Nav> </Nav>
             <DepartmentManagementPage />
+          </div>
+        }
+      />
+      <Route
+        path="user-manage"
+        element={
+          <div>
+            <Nav> </Nav>
+            <UserManagementPage />
           </div>
         }
       />
