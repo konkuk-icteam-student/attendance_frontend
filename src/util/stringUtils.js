@@ -1,5 +1,3 @@
-import { Minimize } from "@mui/icons-material";
-
 //화면에 띄워줄 시간 포맷 함수 PT10H10M10S -> 10:10:10
 export const formatTime = (time) => {
   console.log("time", time);

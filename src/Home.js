@@ -10,13 +10,8 @@ import Nav from "./component/Nav";
 
 //부서 선택될 때 마다 부서 아이디 가져와서 웹소켓 url 연결하기
 function Home() {
-  const [commuteInfo, setCommuteInfo] = useState("출퇴근 버튼을 눌러주세요");
-  const handleCommuteBtn = () => {
-    setCommuteInfo("지문을 인식해주세요");
-  };
   const [workingMembers, setWorkingMembers] = useState([]);
   const [deptList, setDeptList] = useState([]);
-  const [socketData, setSocketData] = useState();
   const [deptID, setDeptID] = useState(() => {
     const storedDeptID = localStorage.getItem("deptID");
 
@@ -27,11 +22,8 @@ function Home() {
     const storedDeptName = localStorage.getItem("deptName");
     return storedDeptName ? storedDeptName : "정보운영팀";
   });
-  const [checkSocketLogin, setCheckSocketLogin] = useState(false);
-  const ws = useRef(null); //webSocket을 담는 변수,
   const [stompClient, setStompClient] = useState(null);
   const [allMembers, setAllMembers] = useState([]);
-  const [webSocket, setWebSocket] = useState(null);
   let sockJS = new SockJS(`${process.env.REACT_APP_API_URL}/ws`);
   let stomp = Stomp.over(sockJS);
 

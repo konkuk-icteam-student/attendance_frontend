@@ -8,9 +8,7 @@ function App() {
   }, []);
   return (
     <div>
-      {/* Page Content */}
       <div className="container px-4 px-lg-5">
-        {/* Content Row */}
         <div className="row gx-4 gx-lg-5">
           <div className="col-md-4 mb-5">
             <div className="card h-100">
@@ -82,15 +80,6 @@ function App() {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      {/* <footer className="py-5 bg-dark">
-        <div className="container px-4 px-lg-5">
-          <p className="m-0 text-center text-white">
-            Copyright &copy; Your Website 2023
-          </p>
-        </div>
-      </footer> */}
     </div>
   );
 }

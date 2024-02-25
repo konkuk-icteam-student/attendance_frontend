@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import { DatePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -25,9 +24,7 @@ function TimeAdditionPickers({ dateChange, timeChange, attendanceStatus }) {
     //출퇴근 정보 넘겨주기
     attendanceStatus(data);
   };
-  useEffect(() => {
-    // console.log("status check", defaultdata);
-  }, []);
+
   return (
     <div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>

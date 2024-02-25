@@ -1,45 +1,46 @@
 import React, { useEffect, useState } from "react";
 import InputGroup from "react-bootstrap/InputGroup";
+
 import client from "../../util/clients";
 //부서 추가, 수정 페이지
 function DepartmentManagementPage() {
   const [department, setDepartment] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [deptOID, setDeptOID] = useState();
   const [deptList, setDeptList] = useState([]);
   const [workerNum, setWorkerNum] = useState(0);
-
-  const StoredDeptID = window.localStorage.getItem("deptID");
+  //선택된 부서 저장하는 함수
   const handleDeptChange = (event) => {
     setDeptOID(event.target.value);
   };
-  const handleChange = (event) => {
+  //부서 인원 입력 필드 값 변경되면 저장하는 함수
+  const handleWorkNumInputChange = (event) => {
     setWorkerNum(event.target.value);
   };
-
+  //부서 추가 함수
   const handleAddDept = async () => {
     try {
-      const response = await client
+      await client
         .post("/dept/new-dept", {
           deptName: department,
-          workerNum: parseInt(workerNum, 10), // Convert to integer
+          workerNum: parseInt(workerNum),
         })
-        .then((res) => {
+        .then(() => {
           setDepartment("");
           alert("부서 추가 완료");
           setLoading(true);
           setWorkerNum(0);
         })
-        .catch((e) => {
+        .catch(() => {
           alert("부서명이 중복됩니다.");
           setDepartment("");
           setWorkerNum(0);
         });
     } catch (e) {
-      setError(e);
+      console.log(e);
     }
   };
+  //부서 삭제 함수
   const handleDeleteDept = async () => {
     await client.delete(`/dept/${deptOID}`).then((res) => {
       alert("부서 삭제 완료");
@@ -49,6 +50,7 @@ function DepartmentManagementPage() {
     window.localStorage.removeItem("deptID");
     window.localStorage.removeItem("deptName");
   };
+  //부서 목록 불러오는 함수
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
@@ -83,7 +85,7 @@ function DepartmentManagementPage() {
           placeholder="인원수"
           aria-label=".form-control-sm example"
           value={workerNum}
-          onChange={handleChange}
+          onChange={handleWorkNumInputChange}
         />
       </InputGroup>
 
@@ -112,11 +114,7 @@ function DepartmentManagementPage() {
 
           {deptList.map((dept) => {
             return (
-              <option
-                key={dept.id}
-                value={dept.id}
-                // disabled={StoredDeptID != dept.id}
-              >
+              <option key={dept.id} value={dept.id}>
                 {dept.deptName}
               </option>
             );

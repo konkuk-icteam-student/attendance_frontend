@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import styles from "../css/Modal.module.css";
 import TimeAdditionPickers from "./TimeAdditionPickers";
 import TimeModificationPickers from "./TimeModificationPickers";
@@ -59,7 +59,6 @@ const ModalComponent = React.memo(
             />
           ) : (
             <TimeAdditionPickers
-              // defaultdata={rowData}
               dateChange={handleEditDate}
               timeChange={handleEditTime}
               attendanceStatus={handleAttendanceStatus}

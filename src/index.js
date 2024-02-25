@@ -1,15 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  NavLink,
-  BrowserRouter,
-} from "react-router-dom";
+import { Route, Routes, BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "./css/styles.css";
 import Nav from "./component/Nav";
 import Home from "./Home";
 import Login from "./pages/common/LoginPage";
@@ -22,7 +15,6 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
-    {/* <Nav /> */}
     <Routes>
       <Route path="/" element={<Home />} />
       <Route

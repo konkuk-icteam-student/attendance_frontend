@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useTable } from "react-table";
 import styles from "../css/Table.module.css";
 function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
@@ -7,26 +7,18 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const handleRowClick = (clickedData) => {
-    console.log("handlerowclick실행", clickedData);
     onEditClick(clickedData);
   };
-  const handleDeleteRowClick = async (clickedData) => {
-    console.log("table row 클릭", "deleterowclick실행", clickedData.original);
-    await onDeleteClick(clickedData.original);
-    // setSelectedRow(null);
-    console.log("selectedRow null인지 확인", selectedRow);
+  const handleDeleteRowClick = (clickedData) => {
+    onDeleteClick(clickedData.original);
   };
   const handleRadioChange = (rowId) => {
-    console.log(rowId, "table row 클릭");
     setSelectedRow(rowId);
   };
   const handleFieldClick = (selectedColHeader) => {
     flag(selectedColHeader);
-    console.log("selectedColHeader", selectedColHeader);
   };
-  useEffect(() => {
-    console.log("selectedRow", selectedRow);
-  }, []);
+
   return (
     <table className="table" {...getTableProps()}>
       <thead>

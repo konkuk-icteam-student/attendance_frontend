@@ -3,25 +3,17 @@ import InputGroup from "react-bootstrap/InputGroup";
 import client from "../../util/clients";
 //회원 관리 페이지
 function UserManagementPage() {
-  const [department, setDepartment] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [deptOID, setDeptOID] = useState();
   const [deptList, setDeptList] = useState([]);
-  const [workerNum, setWorkerNum] = useState(0);
 
   const StoredDeptID = window.localStorage.getItem("deptID");
   const handleDeptChange = (event) => {
     setDeptOID(event.target.value);
   };
-  const handleChange = (event) => {
-    setWorkerNum(event.target.value);
-  };
 
   const handleDeleteDept = async () => {
-    await client.delete(`/user/${deptOID}`).then((res) => {
+    await client.delete(`/user/${deptOID}`).then(() => {
       alert("학생 삭제 완료");
-
       fetchDeptList();
     });
   };
@@ -32,7 +24,7 @@ function UserManagementPage() {
   };
   useEffect(() => {
     fetchDeptList();
-  }, [loading]);
+  }, []);
 
   return (
     <div>
@@ -56,11 +48,7 @@ function UserManagementPage() {
 
           {deptList.map((dept) => {
             return (
-              <option
-                key={dept.id}
-                value={dept.id}
-                // disabled={StoredDeptID != dept.id}
-              >
+              <option key={dept.id} value={dept.id}>
                 {dept.userName}
               </option>
             );
