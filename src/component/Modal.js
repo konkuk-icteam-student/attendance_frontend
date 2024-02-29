@@ -25,17 +25,11 @@ const ModalComponent = React.memo(
     };
     const handleNewAttendanceData = (data) => {
       setEditAttendanceTime(data);
-      console.log(
-        "newData setting: modal.js의 handleNewAttendanceData에서 호출됨",
-        data
-      );
     };
     const handleEditDate = (data) => {
-      console.log("handle edatae", data);
       setEditDate(data);
     };
     const handleEditTime = (data) => {
-      console.log("handle datetime", data);
       setEditAttendanceTime(dayjs(data).format("HH:mm"));
     };
     const handleAttendanceStatus = (attendanceStatus) => {

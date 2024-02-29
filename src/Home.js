@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 // import "./css/styles.css";
@@ -37,14 +37,11 @@ function Home() {
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
-
-      console.log(res.data);
     });
   };
   //부서별 전체 학생 조회
   const fetchAllMembers = async () => {
     client.get(`/dept/${deptID}`).then((res) => {
-      console.log("all members", res.data);
       setAllMembers(res.data.users);
     });
   };

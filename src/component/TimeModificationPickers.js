@@ -14,8 +14,6 @@ function TimeModificationPickers({
   const [UpdatedAttendanceData, setUpdateAttendanceData] =
     useState(defaultdata);
   const handleEditTime = (data) => {
-    console.log("updatedat", data);
-
     const updatedata = {
       ...UpdatedAttendanceData,
       attendanceTime: dayjs(data).format("HH:mm") + ":00.000",
@@ -24,7 +22,6 @@ function TimeModificationPickers({
     updatedTimeData(updatedata);
   };
   const handleEditDate = (data) => {
-    console.log("date", data);
     const updatedData = {
       ...UpdatedAttendanceData,
       arriveAttendance: {
@@ -72,7 +69,6 @@ function TimeModificationPickers({
         <TimePicker
           label="출근 time picker"
           onChange={(data) => {
-            console.log("timedata", data);
             // dateChange(data);
             handleEditTime(data);
           }}
@@ -86,7 +82,6 @@ function TimeModificationPickers({
         <TimePicker
           label="퇴근 time picker"
           onChange={(data) => {
-            console.log("timedata", data);
             handleEditTime(data);
           }}
           disabled={selectedHeader !== "퇴근"}

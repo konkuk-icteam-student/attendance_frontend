@@ -44,16 +44,18 @@ function DepartmentManagementPage() {
   const handleDeleteDept = async () => {
     await client.delete(`/dept/${deptOID}`).then((res) => {
       alert("부서 삭제 완료");
-      fetchDeptList();
+      setLoading(true);
     });
-
-    window.localStorage.removeItem("deptID");
-    window.localStorage.removeItem("deptName");
+    if (deptOID === window.localStorage.getItem("deptID")) {
+      window.localStorage.removeItem("deptID");
+      window.localStorage.removeItem("deptName");
+    }
   };
   //부서 목록 불러오는 함수
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
+      setLoading(false);
     });
   };
   useEffect(() => {

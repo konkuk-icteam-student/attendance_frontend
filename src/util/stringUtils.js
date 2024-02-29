@@ -1,12 +1,9 @@
 //화면에 띄워줄 시간 포맷 함수 PT10H10M10S -> 10:10:10
 export const formatTime = (time) => {
-  console.log("time", time);
-
   //시간에 H,M두개 다 들어가있으면
   if (time.includes("H") && time.includes("M")) {
     let hour = time.split("H")[0].replace("PT", "");
     let minute = time.split("H")[1].split("M")[0];
-    let second = time.split("M")[1].split("S")[0];
     if (hour.length === 0) hour = "0";
 
     if (minute.length === 0) minute = "0";

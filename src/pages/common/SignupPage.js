@@ -36,7 +36,6 @@ function Signup() {
   };
   const handleSignup = () => {
     //회원가입 버튼 눌렀을 때
-    console.log(studentDepartment);
     client
       .post("/user/new-user", {
         user_id: studentId,
@@ -45,8 +44,7 @@ function Signup() {
         userPhoneNum: studentPhoneNum,
         dept: studentDepartment,
       })
-      .then((response) => {
-        console.log(response);
+      .then(() => {
         alert("회원가입 성공");
         navigate("/login");
       });
@@ -54,7 +52,6 @@ function Signup() {
 
   useEffect(() => {
     client.get("/dept/list").then((response) => {
-      console.log(response.data);
       setDepartmentsList(response.data);
     });
   }, [studentDepartment]);

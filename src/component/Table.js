@@ -71,7 +71,6 @@ function Table({ columns, data, onEditClick, onDeleteClick, flag }) {
                     onClick={
                       isPossibleToClick
                         ? () => {
-                            console.log("table row 클릭 cell row", cell);
                             if (
                               cell.column.id ===
                               "arriveAttendance.attendanceTime"
