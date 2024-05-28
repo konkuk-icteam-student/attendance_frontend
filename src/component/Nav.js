@@ -3,14 +3,37 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../util/AuthContext"; // AuthContext 임포트
 
 function MyNav({ deptName }) {
   const navigate = useNavigate();
+  const { auth, logout } = useContext(AuthContext); // AuthContext 사용
+
   const goLogin = (e) => {
     e.preventDefault();
     navigate("/login");
   };
+
+  const handleManageClick = (e) => {
+    e.preventDefault();
+    if (auth) {
+      navigate("/manage");
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await logout();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
+
   const StoredDeptName = window.localStorage.getItem("deptName");
 
   return (
@@ -18,11 +41,9 @@ function MyNav({ deptName }) {
       {["sm"].map((expand) => (
         <Navbar key={expand} expand={expand} className="bg-body-tertiary mb-3">
           <Container fluid>
-            {StoredDeptName ? (
-              <Navbar.Brand href="/">건국대 {StoredDeptName}</Navbar.Brand>
-            ) : (
-              <Navbar.Brand href="/">건국대 {deptName}</Navbar.Brand>
-            )}
+            <Navbar.Brand href="/">
+              건국대 {StoredDeptName ? StoredDeptName : deptName}
+            </Navbar.Brand>
             <Navbar.Toggle aria-controls={`offcanvasNavbar-expand-${expand}`} />
             <Navbar.Offcanvas
               id={`offcanvasNavbar-expand-${expand}`}
@@ -36,8 +57,15 @@ function MyNav({ deptName }) {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-end flex-grow-1 pe-3">
-                  <Nav.Link onClick={goLogin}>Login</Nav.Link>
-                  <Nav.Link href="/manage">Manage</Nav.Link>
+                  {auth ? (
+                    <>
+                      <Nav.Link href="#">환영합니다! {auth.name} 님</Nav.Link>
+                      <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                    </>
+                  ) : (
+                    <Nav.Link onClick={goLogin}>Login</Nav.Link>
+                  )}
+                  <Nav.Link onClick={handleManageClick}>Manage</Nav.Link>
                 </Nav>
               </Offcanvas.Body>
             </Navbar.Offcanvas>

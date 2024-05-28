@@ -43,8 +43,8 @@ function Board(props) {
                       <AccountCircleIcon fontSize="large" />
                     </ListItemAvatar>
                     <ListItemText
-                      primary={member.userName}
-                      secondary={member.userId}
+                      primary={member.name}
+                      secondary={member.loginId}
                     />
                   </ListItem>
                   {index < numRows - 1 && (

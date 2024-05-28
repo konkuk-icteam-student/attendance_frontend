@@ -37,12 +37,12 @@ function Signup() {
   const handleSignup = () => {
     //회원가입 버튼 눌렀을 때
     client
-      .post("/user/new-user", {
-        user_id: studentId,
-        user_pw: studentPw,
-        user_name: studentName,
-        userPhoneNum: studentPhoneNum,
-        dept: studentDepartment,
+      .post("/member/signUp", {
+        loginId: studentId,
+        password: studentPw,
+        name: studentName,
+        phoneNumber: studentPhoneNum,
+        department: studentDepartment,
       })
       .then(() => {
         alert("회원가입 성공");

@@ -1,5 +1,5 @@
 import axios from "axios";
 const client = axios.create({
-  baseURL: process.env.REACT_APP_API_URL, //서버주소(.env파일에 저장된 값)
+  withCredentials: true, // 이 옵션은 쿠키를 포함한 요청을 허용합니다.
 });
 export default client;
