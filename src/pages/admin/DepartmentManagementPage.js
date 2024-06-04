@@ -114,13 +114,17 @@ function DepartmentManagementPage() {
             삭제할 부서선택
           </option>
 
-          {deptList.map((dept) => {
-            return (
+          {Array.isArray(deptList) && deptList.length > 0 ? (
+            deptList.map((dept) => (
               <option key={dept.id} value={dept.id}>
                 {dept.deptName}
               </option>
-            );
-          })}
+            ))
+          ) : (
+            <option disabled>
+              부서 목록을 불러오는데 문제가 발생했습니다.
+            </option>
+          )}
         </select>
       </InputGroup>
 

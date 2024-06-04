@@ -35,6 +35,7 @@ function Home() {
   const fetchDeptList = async () => {
     client.get("/dept/list").then((res) => {
       setDeptList(res.data);
+      console.log(res.data);
     });
   };
 
