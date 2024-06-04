@@ -82,15 +82,21 @@ function Home() {
             <option disabled selected value="">
               부서선택
             </option>
-            {deptList.map((dept) => (
-              <option
-                key={dept.id}
-                value={dept.id}
-                selected={deptID === dept.id}
-              >
-                {dept.deptName}
+            {Array.isArray(deptList) && deptList.length > 0 ? (
+              deptList.map((dept) => (
+                <option
+                  key={dept.id}
+                  value={dept.id}
+                  selected={deptID === dept.id}
+                >
+                  {dept.deptName}
+                </option>
+              ))
+            ) : (
+              <option disabled>
+                부서 목록을 불러오는데 문제가 발생했습니다.
               </option>
-            ))}
+            )}
           </select>
         </div>
         <div className="row gx-4 gx-lg-5 align-items-center my-5">
