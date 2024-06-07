@@ -6,6 +6,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+
 function Signup() {
   const [departmentsList, setDepartmentsList] = useState([]);
   const [studentId, setStudentId] = useState("");
@@ -13,6 +14,7 @@ function Signup() {
   const [studentName, setStudentName] = useState("");
   const [studentPhoneNum, setStudentPhoneNum] = useState("");
   const [studentDepartment, setStudentDepartment] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // 에러 메시지 상태 추가
 
   let navigate = useNavigate();
   const handleStudentIdChange = (event) => {
@@ -34,6 +36,7 @@ function Signup() {
   const handleDepartmentSelect = (selectedValue) => {
     setStudentDepartment(selectedValue);
   };
+
   const handleSignup = () => {
     //회원가입 버튼 눌렀을 때
     client
@@ -47,6 +50,15 @@ function Signup() {
       .then(() => {
         alert("회원가입 성공");
         navigate("/login");
+      })
+      .catch((error) => {
+        if (error.response) {
+          setErrorMessage(error.response.data.message || "회원가입 실패");
+        } else if (error.request) {
+          setErrorMessage("회원가입 실패: 서버 응답 없음");
+        } else {
+          setErrorMessage("회원가입 실패: " + error.message);
+        }
       });
   };
 
@@ -55,11 +67,17 @@ function Signup() {
       setDepartmentsList(response.data);
     });
   }, [studentDepartment]);
+
   return (
     <>
       <div className="position-relative text-center">
         {" "}
         <h2 className="mb-3">회원가입</h2>
+        {errorMessage && (
+          <div className="alert alert-danger" role="alert">
+            {errorMessage}
+          </div>
+        )}
         <InputGroup className="mb-3 w-50 mx-auto">
           <InputGroup.Text id="basic-addon1">ID </InputGroup.Text>
           <input
@@ -125,6 +143,7 @@ function Signup() {
             {departmentsList.map((dept) => {
               return (
                 <MenuItem
+                  key={dept.deptName} // 각 항목에 키를 추가합니다.
                   value={dept.deptName}
                   onClick={() => handleDepartmentSelect(dept.deptName)}
                 >
