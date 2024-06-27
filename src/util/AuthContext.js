@@ -41,6 +41,7 @@ export default function AuthProvider({ children }) {
       const response = await client.get("/member/isLogin");
       setAuth(response.data);
     } catch (error) {
+      console.log(error);
       setAuth(null);
     }
   };
