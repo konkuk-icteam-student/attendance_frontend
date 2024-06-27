@@ -3,12 +3,16 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Offcanvas from "react-bootstrap/Offcanvas";
 import { useNavigate } from "react-router-dom";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { AuthContext } from "../util/AuthContext"; // AuthContext 임포트
 
 function MyNav({ deptName }) {
   const navigate = useNavigate();
   const { auth, logout } = useContext(AuthContext); // AuthContext 사용
+
+  useEffect(() => {
+    console.log(auth);
+  }, [auth]);
 
   const goLogin = (e) => {
     e.preventDefault();
@@ -35,7 +39,6 @@ function MyNav({ deptName }) {
   };
 
   const StoredDeptName = window.localStorage.getItem("deptName");
-  console.log(auth);
 
   return (
     <>
