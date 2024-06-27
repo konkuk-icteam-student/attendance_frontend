@@ -58,7 +58,7 @@ function MyNav({ deptName }) {
               </Offcanvas.Header>
               <Offcanvas.Body>
                 <Nav className="justify-content-end flex-grow-1 pe-3">
-                  {auth ? (
+                  {auth != null || auth != undefined ? (
                     <>
                       <Nav.Link href="#">환영합니다! {auth.name} 님</Nav.Link>
                       <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
