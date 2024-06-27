@@ -71,7 +71,7 @@ function Home() {
   }, [deptID]);
 
   console.log(deptList);
-  console.log("h2");
+  console.log("h1");
 
   return (
     <div>
