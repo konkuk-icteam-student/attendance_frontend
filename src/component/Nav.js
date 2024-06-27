@@ -12,6 +12,7 @@ function MyNav({ deptName }) {
 
   useEffect(() => {
     console.log(auth);
+    if (auth == null) console.log("null값임");
   }, [auth]);
 
   const goLogin = (e) => {
