@@ -35,6 +35,7 @@ function MyNav({ deptName }) {
   };
 
   const StoredDeptName = window.localStorage.getItem("deptName");
+  console.log(auth);
 
   return (
     <>
