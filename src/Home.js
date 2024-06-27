@@ -71,11 +71,7 @@ function Home() {
   }, [deptID]);
 
   console.log(deptList);
-<<<<<<< HEAD
-  console.log("hi");
   console.log("h2");
-=======
->>>>>>> origin/main
 
   return (
     <div>
