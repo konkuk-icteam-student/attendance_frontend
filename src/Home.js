@@ -70,6 +70,8 @@ function Home() {
     };
   }, [deptID]);
 
+  console.log(deptList);
+
   return (
     <div>
       <MyNav deptName={deptName} />
