@@ -105,7 +105,7 @@ function Home() {
         </div>
         <div className="row gx-4 gx-lg-5 align-items-center my-5">
           <div className="col-lg-8">
-            <h1 className="font-weight-light">2023-2&nbsp;정보운영팀 출근부</h1>
+            <h1 className="font-weight-light">2024-1&nbsp;정보운영팀 출근부</h1>
             <p>관리용 홈페이지..</p>
           </div>
         </div>
