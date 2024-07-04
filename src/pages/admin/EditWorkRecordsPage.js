@@ -349,7 +349,7 @@ function EditWorkRecords() {
                 studentList.map((student) => {
                   return (
                     <option key={student.loginId} value={student.loginId}>
-                      {student.userName}
+                      {student.name}
                     </option>
                   );
                 })
