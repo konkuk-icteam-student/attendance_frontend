@@ -239,7 +239,7 @@ function EditWorkRecords() {
       attendanceDate: editDate,
 
       attendanceTime: editDate + " " + editAttendanceTime + ":00.000",
-      userId: selectedStudentId,
+      loginId: selectedStudentId,
       status: attendanceStatus == "출근" ? 1 : 0,
     };
 
@@ -348,7 +348,7 @@ function EditWorkRecords() {
                 //학생 목록 띄우기
                 studentList.map((student) => {
                   return (
-                    <option key={student.userId} value={student.userId}>
+                    <option key={student.loginId} value={student.loginId}>
                       {student.userName}
                     </option>
                   );
